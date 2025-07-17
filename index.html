@@ -10,6 +10,7 @@
       color: #333;
       padding: 2em;
       line-height: 1.8;
+      text-align: center;
     }
     h1 {
       color: #e67e22;
@@ -22,6 +23,10 @@
     }
     .section {
       margin-bottom: 2em;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
     }
     .footer {
       text-align: center;
@@ -29,13 +34,35 @@
       color: #777;
       margin-top: 3em;
     }
+
+    /* ぷよぷよゲーム用 */
+    #gameBoard {
+      width: 264px; /* 6個 × 40px + 5×4px gap */
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: repeat(6, 40px);
+      grid-gap: 4px;
+    }
+    .egg {
+      width: 40px;
+      height: 40px;
+      background-image: url('fried_egg.png');
+      background-size: contain;
+      background-repeat: no-repeat;
+      cursor: pointer;
+      user-select: none;
+    }
+    /* 4色フィルター */
+    .color0 { filter: hue-rotate(0deg); }
+    .color1 { filter: hue-rotate(90deg); }
+    .color2 { filter: hue-rotate(180deg); }
+    .color3 { filter: hue-rotate(270deg); }
   </style>
 </head>
 <body>
 
   <h1>🍳 おいしい目玉焼きの作り方</h1>
 
-  <!-- メインの目玉焼き画像（GitHubにアップロード済みの画像を使う） -->
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
   
   <div class="section">
@@ -73,28 +100,35 @@
     下の「スタート」ボタンを押すと、目玉焼きが何個か表示されます。全部で何個か、数えて答えてね！
   </p>
 
-  <button onclick="startGame()">スタート</button>
+  <button onclick="startCountGame()">スタート</button>
   <div id="eggContainer" style="margin-top: 20px;"></div>
 
   <div style="margin-top: 20px;">
     <label for="answer">いくつあった？ </label>
     <input type="number" id="answer" />
-    <button onclick="checkAnswer()">答える</button>
+    <button onclick="checkCountAnswer()">答える</button>
   </div>
 
   <p id="result"></p>
 
+  <hr />
+
+  <h2>🥚 目玉焼きぷよぷよゲーム（簡易版）</h2>
+  <p>6×6マスに4色の目玉焼きが並びます。</p>
+  <div id="gameBoard"></div>
+
   <script>
+    // 目玉焼きを数えるゲーム用
     let correctCount = 0;
 
-    function startGame() {
+    function startCountGame() {
       const container = document.getElementById("eggContainer");
       container.innerHTML = "";
 
       correctCount = Math.floor(Math.random() * 6) + 5; // 5〜10個
       for (let i = 0; i < correctCount; i++) {
         const img = document.createElement("img");
-        img.src = "fried_egg.png"; // GitHubにアップロードした画像名に合わせて変更してください
+        img.src = "fried_egg.png";
         img.alt = "目玉焼き";
         img.style.width = "60px";
         img.style.margin = "5px";
@@ -105,7 +139,7 @@
       document.getElementById("answer").value = "";
     }
 
-    function checkAnswer() {
+    function checkCountAnswer() {
       const userAnswer = parseInt(document.getElementById("answer").value);
       const result = document.getElementById("result");
       if (userAnswer === correctCount) {
@@ -116,6 +150,34 @@
         result.style.color = "red";
       }
     }
+
+    // 目玉焼きぷよぷよゲーム用（表示だけの簡易版）
+
+    const ROWS = 6;
+    const COLS = 6;
+    const colors = 4;
+    const board = [];
+
+    const gameBoard = document.getElementById('gameBoard');
+
+    function initPuyoBoard() {
+      gameBoard.innerHTML = '';
+      for(let r = 0; r < ROWS; r++) {
+        board[r] = [];
+        for(let c = 0; c < COLS; c++) {
+          const colorIdx = Math.floor(Math.random() * colors);
+          board[r][c] = colorIdx;
+
+          const div = document.createElement('div');
+          div.className = 'egg color' + colorIdx;
+          div.dataset.row = r;
+          div.dataset.col = c;
+          gameBoard.appendChild(div);
+        }
+      }
+    }
+
+    initPuyoBoard();
   </script>
 
   <div class="footer">© 2025 medamayakingdom</div>

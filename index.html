@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>おいしい目玉焼きの作り方</title>
   <style>
     body {
@@ -55,11 +56,14 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
+      border: 1.5px solid #333;
+      box-sizing: border-box;
+      border-radius: 6px;
     }
-    .color0 { filter: hue-rotate(0deg); background-image: url('fried_egg.png'); }
-    .color1 { filter: hue-rotate(90deg); background-image: url('fried_egg.png'); }
-    .color2 { filter: hue-rotate(180deg); background-image: url('fried_egg.png'); }
-    .color3 { filter: hue-rotate(270deg); background-image: url('fried_egg.png'); }
+    .color0 { background-image: url('fried_egg.png'); filter: hue-rotate(0deg); }
+    .color1 { background-image: url('fried_egg.png'); filter: hue-rotate(50deg); }
+    .color2 { background-image: url('fried_egg.png'); filter: hue-rotate(200deg); }
+    .color3 { background-image: url('fried_egg.png'); filter: hue-rotate(90deg) saturate(1.5); }
   </style>
 </head>
 <body>
@@ -67,21 +71,59 @@
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
 
   <div class="section">
-    <h2>料理方法</h2>
-    <p>...ここは省略...</p>
+    <h2>材料（1人分）</h2>
+    <ul>
+      <li>卵 … 1個</li>
+      <li>油 … 小さじ1（サラダ油でもごま油でもOK）</li>
+      <li>塩 … ひとつまみ</li>
+    </ul>
   </div>
 
   <div class="section">
-    <h2>🥚 目玉焼き数えゲーム</h2>
+    <h2>作り方（詳細版）</h2>
+    <ol>
+      <li><strong>フライパンを中火で温める</strong><br>
+          油を入れる前にフライパンを適度に温めることで、卵がくっつきにくくなります。</li>
+      <li><strong>油を入れる</strong><br>
+          小さじ1程度のサラダ油やごま油をフライパン全体に広げてください。油の種類で風味が変わります。</li>
+      <li><strong>卵を別の容器に割ってからそっと入れる</strong><br>
+          殻が入るリスクを減らせます。</li>
+      <li><strong>白身が固まり始めるまで触らず待つ</strong><br>
+          焦らずに白身の縁が固まってくるまで待ちましょう。フタをすると蒸気でふっくら仕上がります。</li>
+      <li><strong>弱火にして蓋をする</strong><br>
+          黄身の表面がうっすら白くなるまで加熱し、好みの硬さになるまで調整します。</li>
+      <li><strong>火を止めて塩をふる</strong><br>
+          お好みで塩を軽く振りかけて、熱いうちに召し上がれ。</li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>ワンポイントアドバイス</h2>
+    <p>
+      水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br>
+      フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめです。
+    </p>
+  </div>
+
+  <hr />
+
+  <div class="section">
+    <h2>🥚 目玉焼きを数えるゲーム</h2>
+    <p>「スタート」ボタンを押すと、目玉焼きが何個か表示されます。全部で何個か数えて答えてね！</p>
     <button onclick="startCountGame()">スタート</button>
-    <div id="eggContainer"></div>
-    <input type="number" id="answer" />
-    <button onclick="checkCountAnswer()">答える</button>
+    <div id="eggContainer" style="margin-top: 20px;"></div>
+    <div style="margin-top: 10px;">
+      <label for="answer">いくつあった？ </label>
+      <input type="number" id="answer" />
+      <button onclick="checkCountAnswer()">答える</button>
+    </div>
     <p id="result"></p>
   </div>
 
+  <hr />
+
   <div class="section">
-    <h2>🥚 目玉焼きぷよぷよ</h2>
+    <h2>🥚 目玉焼きぷよぷよゲーム（簡易版）</h2>
     <p>矢印キーで操作。スコア表示、NEXT表示付き</p>
     <div id="puyoGame">
       <div>
@@ -95,49 +137,65 @@
     </div>
   </div>
 
-  <div class="footer">&copy; 2025 medamayakingdom</div>
+  <div class="footer">© 2025 medamayakingdom</div>
 
   <script>
-    // Count Game
+    // 目玉焼きを数えるゲーム用
     let correctCount = 0;
     function startCountGame() {
       const container = document.getElementById("eggContainer");
       container.innerHTML = "";
-      correctCount = Math.floor(Math.random() * 6) + 5;
+      correctCount = Math.floor(Math.random() * 6) + 5; // 5〜10個
       for (let i = 0; i < correctCount; i++) {
         const img = document.createElement("img");
         img.src = "fried_egg.png";
+        img.alt = "目玉焼き";
         img.style.width = "60px";
         img.style.margin = "5px";
         container.appendChild(img);
       }
       document.getElementById("result").innerText = "";
+      document.getElementById("answer").value = "";
     }
     function checkCountAnswer() {
       const userAnswer = parseInt(document.getElementById("answer").value);
       const result = document.getElementById("result");
-      result.innerText = userAnswer === correctCount ? "🎉 正解。" : 残念。正解は ${correctCount};
+      if (userAnswer === correctCount) {
+        result.innerText = "🎉 正解！よく数えたね！";
+        result.style.color = "green";
+      } else {
+        result.innerText = `😢 残念！正解は ${correctCount} 個でした`;
+        result.style.color = "red";
+      }
     }
 
-    // Puyo Logic
-    const rows = 12;
-    const cols = 6;
-    const board = Array.from({ length: rows }, () => Array(cols).fill(null));
-    let current, next, score = 0;
+    // 目玉焼きぷよぷよゲーム用（表示＋簡易ロジック）
 
-    const colors = [0, 1, 2, 3];
+    const ROWS = 12;
+    const COLS = 6;
+    const COLORS = [0,1,2,3]; // 4色
+    const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    let current = null;
+    let next = [randColor(), randColor()];
+    let score = 0;
 
     const boardDiv = document.getElementById("board");
     const nextDiv = document.getElementById("next");
     const scoreSpan = document.getElementById("score");
 
+    function randColor() {
+      return COLORS[Math.floor(Math.random() * COLORS.length)];
+    }
+
     function drawBoard() {
       boardDiv.innerHTML = "";
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
+      for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
           const cell = document.createElement("div");
-          cell.className = "cell";
-          if (board[r][c] != null) cell.classList.add("color" + board[r][c]);
+          cell.classList.add("cell");
+          if(board[r][c] !== null) {
+            cell.classList.add("color" + board[r][c]);
+          }
           boardDiv.appendChild(cell);
         }
       }
@@ -146,65 +204,180 @@
     function drawNext() {
       nextDiv.innerHTML = "";
       next.forEach(color => {
-        const div = document.createElement("div");
-        div.className = "cell color" + color;
-        nextDiv.appendChild(div);
+        const cell = document.createElement("div");
+        cell.classList.add("cell", "color"+color);
+        nextDiv.appendChild(cell);
       });
     }
 
     function spawn() {
-      current = { x: 2, y: 0, pair: [...next] };
+      current = { x: 2, y: 1, pair: [...next], vertical: true };
       next = [randColor(), randColor()];
       drawNext();
     }
 
-    function randColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
+    function canMove(x, y) {
+      if(y < 0 || y >= ROWS) return false;
+      if(x < 0 || x >= COLS) return false;
+      if(board[y][x] !== null) return false;
+      return true;
     }
 
-    function tick() {
-      if (!current) {
-        spawn();
-      }
-      if (canMove(0, 1)) {
-        current.y++;
+    function canPlaceCurrent(newX, newY, vertical) {
+      if(vertical) {
+        return canMove(newX, newY) && canMove(newX, newY-1);
       } else {
-        place();
-        clearLines();
+        return canMove(newX, newY) && canMove(newX+1, newY);
+      }
+    }
+
+    function placeCurrent() {
+      if(current.vertical) {
+        board[current.y][current.x] = current.pair[0];
+        board[current.y-1][current.x] = current.pair[1];
+      } else {
+        board[current.y][current.x] = current.pair[0];
+        board[current.y][current.x+1] = current.pair[1];
+      }
+    }
+
+    function clearMatches() {
+      let visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+      let toClear = [];
+
+      function dfs(r, c, color) {
+        if(r < 0 || r >= ROWS || c < 0 || c >= COLS) return [];
+        if(visited[r][c]) return [];
+        if(board[r][c] !== color) return [];
+        visited[r][c] = true;
+        let group = [[r, c]];
+        group = group.concat(dfs(r+1,c,color));
+        group = group.concat(dfs(r-1,c,color));
+        group = group.concat(dfs(r,c+1,color));
+        group = group.concat(dfs(r,c-1,color));
+        return group;
+      }
+
+      for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+          if(board[r][c] !== null && !visited[r][c]) {
+            let group = dfs(r, c, board[r][c]);
+            if(group.length >= 4) toClear.push(...group);
+          }
+        }
+      }
+
+      if(toClear.length > 0) {
+        toClear.forEach(([r,c]) => board[r][c] = null);
+        score += toClear.length * 10;
+        scoreSpan.innerText = score;
+        return true;
+      }
+      return false;
+    }
+
+    function dropBlocks() {
+      for(let c=0; c<COLS; c++) {
+        for(let r=ROWS-2; r>=0; r--) {
+          if(board[r][c] !== null) {
+            let nr = r;
+            while(nr + 1 < ROWS && board[nr+1][c] === null) {
+              board[nr+1][c] = board[nr][c];
+              board[nr][c] = null;
+              nr++;
+            }
+          }
+        }
+      }
+    }
+
+    function gameTick() {
+      if(current === null) {
         spawn();
+      } else {
+        // 下に移動できるか？
+        let newY = current.y + 1;
+        if(current.vertical) {
+          if(canMove(current.x, newY) && canMove(current.x, newY - 1)) {
+            current.y = newY;
+          } else {
+            placeCurrent();
+            let cleared = true;
+            while(cleared) {
+              dropBlocks();
+              cleared = clearMatches();
+            }
+            current = null;
+          }
+        } else {
+          if(canMove(current.x, newY)) {
+            if(canMove(current.x + 1, newY)) {
+              current.y = newY;
+            } else {
+              placeCurrent();
+              let cleared = true;
+              while(cleared) {
+                dropBlocks();
+                cleared = clearMatches();
+              }
+              current = null;
+            }
+          } else {
+            placeCurrent();
+            let cleared = true;
+            while(cleared) {
+              dropBlocks();
+              cleared = clearMatches();
+            }
+            current = null;
+          }
+        }
       }
       drawBoard();
     }
 
-    function canMove(dx, dy) {
-      const x = current.x, y = current.y;
-      return y + dy < rows && board[y + dy][x] === null;
+    function rotateCurrent() {
+      if(current === null) return;
+      const {x, y, vertical} = current;
+      if(vertical) {
+        // 縦→横
+        if(canPlaceCurrent(x, y, false)) {
+          current.vertical = false;
+        }
+      } else {
+        // 横→縦
+        if(canPlaceCurrent(x, y, true)) {
+          current.vertical = true;
+        }
+      }
     }
 
-    function place() {
-      board[current.y][current.x] = current.pair[0];
-      if (current.y - 1 >= 0) board[current.y - 1][current.x] = current.pair[1];
-    }
-
-    function clearLines() {
-      // 仮: ライン消去せずスコアだけ増やす
-      score += 10;
-      scoreSpan.innerText = score;
-    }
-
-    // 操作
-    document.addEventListener("keydown", e => {
-      if (!current) return;
-      if (e.key === "ArrowLeft" && current.x > 0) current.x--;
-      if (e.key === "ArrowRight" && current.x < cols - 1) current.x++;
-      if (e.key === "ArrowDown") tick();
+    document.addEventListener("keydown", (e) => {
+      if(current === null) return;
+      switch(e.key) {
+        case "ArrowLeft":
+          if(canPlaceCurrent(current.x - 1, current.y, current.vertical)) {
+            current.x--;
+          }
+          break;
+        case "ArrowRight":
+          if(canPlaceCurrent(current.x + 1, current.y, current.vertical)) {
+            current.x++;
+          }
+          break;
+        case "ArrowDown":
+          gameTick();
+          break;
+        case "ArrowUp":
+          rotateCurrent();
+          break;
+      }
       drawBoard();
     });
 
-    // 初期化
-    next = [randColor(), randColor()];
     drawNext();
-    setInterval(tick, 1000);
+    drawBoard();
+    setInterval(gameTick, 800);
   </script>
 </body>
 </html>

@@ -65,6 +65,56 @@
     </p>
   </div>
 
+  <hr>
+<h2>🥚 目玉焼きを数えるゲーム</h2>
+<p>下の「スタート」ボタンを押すと、目玉焼きが何個か表示されます。全部で何個か、数えて答えてね！</p>
+
+<button onclick="startGame()">スタート</button>
+<div id="eggContainer" style="margin-top: 20px;"></div>
+
+<div style="margin-top: 20px;">
+  <label for="answer">いくつあった？ </label>
+  <input type="number" id="answer" />
+  <button onclick="checkAnswer()">答える</button>
+</div>
+
+<p id="result"></p>
+
+<script>
+  let correctCount = 0;
+
+  function startGame() {
+    const container = document.getElementById("eggContainer");
+    container.innerHTML = "";
+
+    correctCount = Math.floor(Math.random() * 6) + 5; // 5〜10個
+    for (let i = 0; i < correctCount; i++) {
+      const img = document.createElement("img");
+      img.src = "https://upload.wikimedia.org/wikipedia/commons/5/5a/Fried_egg%2C_sunny_side_up.jpg";
+      img.alt = "目玉焼き";
+      img.style.width = "60px";
+      img.style.margin = "5px";
+      container.appendChild(img);
+    }
+
+    document.getElementById("result").innerText = "";
+    document.getElementById("answer").value = "";
+  }
+
+  function checkAnswer() {
+    const userAnswer = parseInt(document.getElementById("answer").value);
+    const result = document.getElementById("result");
+    if (userAnswer === correctCount) {
+      result.innerText = "🎉 正解！よく数えたね！";
+      result.style.color = "green";
+    } else {
+      result.innerText = `😢 残念！正解は ${correctCount} 個でした`;
+      result.style.color = "red";
+    }
+  }
+</script>
+
+
   <div class="footer">
     © 2025 medamayakingdom
   </div>

@@ -67,20 +67,23 @@
       grid-template-columns: repeat(2, 40px);
       padding: 6px;
     }
-    .cell {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      border-radius: 6px;
-      transition: opacity 0.3s ease;
-      background: white; /* 空白セルは白背景 */
-    }
-    /* 色指定（真っ赤、真っ青、真みどり、真っ黄色） */
-    .color0 { background-color: #ff0000; }    /* 真っ赤 */
-    .color1 { background-color: #0000ff; }    /* 真っ青 */
-    .color2 { background-color: #00cc00; }    /* 真みどり */
-    .color3 { background-color: #ffff00; }    /* 真っ黄色 */
+.cell {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  border-radius: 6px;
+  background: white;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.color0 { background-image: url('fried_egg.png'); filter: hue-rotate(0deg); }
+.color1 { background-image: url('fried_egg.png'); filter: hue-rotate(210deg); }
+.color2 { background-image: url('fried_egg.png'); filter: hue-rotate(90deg); }
+.color3 { background-image: url('fried_egg.png'); filter: hue-rotate(45deg); }
+
 
     /* チカチカ用アニメーション */
     @keyframes blink {

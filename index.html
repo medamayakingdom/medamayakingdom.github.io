@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>おいしい目玉焼きの作り方 - v1.2</title>
+  <title>おいしい目玉焼きの作り方 - v1.3</title>
   <style>
     body {
       font-family: sans-serif;
@@ -68,46 +68,96 @@
       border-radius: 6px;
     }
     .color0 { background-image: url('fried_egg.png'); filter: none; }
-    .color1 { background-image: url('fried_egg.png'); filter: hue-rotate(60deg); } /* 黄色寄り */
-    .color2 { background-image: url('fried_egg.png'); filter: hue-rotate(200deg); } /* 青 */
-    .color3 { background-image: url('fried_egg.png'); filter: hue-rotate(120deg); } /* 濃い緑 */
+    .color1 { background-image: url('fried_egg.png'); filter: hue-rotate(60deg); }
+    .color2 { background-image: url('fried_egg.png'); filter: hue-rotate(200deg); }
+    .color3 { background-image: url('fried_egg.png'); filter: hue-rotate(120deg); }
 
-    /* 操作ボタンエリア */
+    /* 操作ボタン配置 */
     #controls {
       margin-top: 20px;
       display: flex;
       justify-content: center;
-      gap: 12px;
+      gap: 16px;
       flex-wrap: wrap;
+      align-items: center;
+      user-select: none;
     }
-    #controls button {
+    /* 十字キーと回転ボタンのラッパー */
+    #directionalButtons {
+      display: grid;
+      grid-template-columns: 40px 40px 40px;
+      grid-template-rows: 40px 40px 40px;
+      gap: 8px;
+      user-select: none;
+    }
+    /* 空セル */
+    #directionalButtons .empty {
+      pointer-events: none;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+    /* 十字キーのボタン */
+    #directionalButtons button {
       background-color: #e67e22;
       border: none;
       color: white;
-      font-size: 18px;
-      padding: 12px 20px;
+      font-size: 24px;
       border-radius: 8px;
       cursor: pointer;
       box-shadow: 0 3px 6px rgba(0,0,0,0.2);
       transition: background-color 0.3s ease;
       user-select: none;
-      min-width: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      padding: 0;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
     }
-    #controls button:hover {
+    #directionalButtons button:hover {
       background-color: #d35400;
     }
-    #scoreArea {
-      margin-top: 15px;
-      font-size: 20px;
-      font-weight: bold;
-      color: #e67e22;
+
+    /* 回転ボタン */
+    #rotateButtons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      user-select: none;
+    }
+    #rotateButtons button {
+      width: 48px;
+      height: 48px;
+      background-color: #e67e22;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      user-select: none;
+    }
+    #rotateButtons button:hover {
+      background-color: #d35400;
+    }
+    /* 矢印のSVGスタイル */
+    svg {
+      fill: white;
+      width: 24px;
+      height: 24px;
       user-select: none;
     }
 
   </style>
 </head>
 <body>
-  <h1>🍳 おいしい目玉焼きの作り方 - v1.2</h1>
+  <h1>🍳 おいしい目玉焼きの作り方 - v1.3</h1>
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
 
   <div class="section">
@@ -164,10 +214,34 @@
       </div>
     </div>
     <div id="controls">
-      <button id="btnLeft">←</button>
-      <button id="btnRight">→</button>
-      <button id="btnDown">↓</button>
-      <button id="btnRotate">回転</button>
+      <div id="directionalButtons">
+        <button id="btnUp" title="ハードドロップ ↑">
+          <!-- 上矢印SVG -->
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
+          </svg>
+        </button>
+        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <button id="btnRotateLeft" title="左回転 ⟲">
+          <!-- 左回転矢印SVG -->
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
+            <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
+          </svg>
+        </button>
+
+        <button id="btnLeft" title="左 ←">←</button>
+        <button id="btnDown" title="下 ↓">↓</button>
+        <button id="btnRight" title="右 →">→</button>
+
+        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <button id="btnRotateRight" title="右回転 ⟳">
+          <!-- 右回転矢印SVG -->
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
+            <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
@@ -301,7 +375,6 @@
           ) continue;
           visited[cr][cc] = true;
           group.push([cr, cc]);
-          // 上下左右
           stack.push([cr - 1, cc]);
           stack.push([cr + 1, cc]);
           stack.push([cr, cc - 1]);
@@ -359,9 +432,7 @@
         current.y++;
       } else {
         placeCurrent();
-        while (clearMatches()) {
-          // 連鎖消去
-        }
+        while (clearMatches()) {}
         spawn();
       }
       drawBoard();
@@ -391,19 +462,36 @@
         drawBoard();
       }
     }
-    function rotate() {
+    function rotateRight() {
       if (!current) return;
       const newVertical = !current.vertical;
       if (canPlaceCurrent(current.x, current.y, newVertical)) {
         current.vertical = newVertical;
       } else if (newVertical) {
-        // 横向きから縦向きに変えるとき右隣チェック
         if (canPlaceCurrent(current.x + 1, current.y, newVertical)) {
           current.x++;
           current.vertical = newVertical;
         }
       } else {
-        // 縦向きから横向きに変えるとき左隣チェック
+        if (canPlaceCurrent(current.x - 1, current.y, newVertical)) {
+          current.x--;
+          current.vertical = newVertical;
+        }
+      }
+      drawBoard();
+    }
+    function rotateLeft() {
+      if (!current) return;
+      const newVertical = !current.vertical;
+      // 左回転は右回転の逆の動きをするイメージでOK
+      if (canPlaceCurrent(current.x, current.y, newVertical)) {
+        current.vertical = newVertical;
+      } else if (!newVertical) {
+        if (canPlaceCurrent(current.x + 1, current.y, newVertical)) {
+          current.x++;
+          current.vertical = newVertical;
+        }
+      } else {
         if (canPlaceCurrent(current.x - 1, current.y, newVertical)) {
           current.x--;
           current.vertical = newVertical;
@@ -412,13 +500,27 @@
       drawBoard();
     }
 
+    // ハードドロップ
+    function hardDrop() {
+      if (!current) return;
+      while (canPlaceCurrent(current.x, current.y + 1, current.vertical)) {
+        current.y++;
+      }
+      placeCurrent();
+      while (clearMatches()) {}
+      spawn();
+      drawBoard();
+    }
+
     // ボタンイベント登録
     document.getElementById("btnLeft").addEventListener("click", moveLeft);
     document.getElementById("btnRight").addEventListener("click", moveRight);
     document.getElementById("btnDown").addEventListener("click", moveDown);
-    document.getElementById("btnRotate").addEventListener("click", rotate);
+    document.getElementById("btnRotateRight").addEventListener("click", rotateRight);
+    document.getElementById("btnRotateLeft").addEventListener("click", rotateLeft);
+    document.getElementById("btnUp").addEventListener("click", hardDrop);
 
-    // ゲーム開始＆ループ
+    // 初期化
     spawn();
     drawBoard();
     setInterval(tick, 700);

@@ -2,7 +2,8 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>おいしい目玉焼きの作り方 - v1.6</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>おいしい目玉焼きの作り方 - v1.5</title>
   <style>
     body {
       font-family: sans-serif;
@@ -60,10 +61,10 @@
       border-radius: 8px;
       background: #fffbea;
       box-shadow: 0 0 8px rgba(230, 126, 34, 0.3);
+      width: fit-content;
     }
     #next {
       grid-template-columns: repeat(2, 40px);
-      width: fit-content;
       padding: 6px;
     }
     .cell {
@@ -73,11 +74,13 @@
       box-sizing: border-box;
       border-radius: 6px;
       transition: opacity 0.3s ease;
-      background-color: white; /* 空白セルは白背景 */
-      background-repeat: no-repeat;
-      background-position: center;
-      background-size: contain;
+      background: white; /* 空白セルは白背景 */
     }
+    /* 色指定（真っ赤、真っ青、真みどり、真っ黄色） */
+    .color0 { background-color: #ff0000; }    /* 真っ赤 */
+    .color1 { background-color: #0000ff; }    /* 真っ青 */
+    .color2 { background-color: #00cc00; }    /* 真みどり */
+    .color3 { background-color: #ffff00; }    /* 真っ黄色 */
 
     /* チカチカ用アニメーション */
     @keyframes blink {
@@ -194,6 +197,47 @@
     }
     #pauseBtn:hover {
       background-color: #1f6391;
+    }
+
+    /* -------- スマホ対応のレスポンシブ調整 -------- */
+    @media (max-width: 480px) {
+      body {
+        padding: 1em;
+      }
+      #puyoGame {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+      #board, #next {
+        grid-template-columns: repeat(6, 24px);
+        grid-auto-rows: 24px;
+        gap: 1.5px;
+      }
+      .cell {
+        width: 24px;
+        height: 24px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+      }
+      #buttonGrid {
+        grid-template-columns: repeat(3, 36px);
+        grid-template-rows: repeat(3, 36px);
+        gap: 6px;
+      }
+      #buttonGrid button {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+      #btnRotateLeft, #btnRotateRight {
+        width: 40px;
+        height: 40px;
+      }
+      #pauseBtn {
+        padding: 6px 12px;
+        font-size: 0.9em;
+      }
     }
   </style>
 </head>
@@ -338,8 +382,6 @@
     const COLS = 6;
     const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     const colors = [0, 1, 2, 3];
-    const hueDegrees = [0, 120, 60, 45]; // 色相の角度（赤、青、緑、黄）
-
     let current = null;
     let next = [];
     let score = 0;
@@ -360,12 +402,7 @@
           const cell = document.createElement("div");
           cell.className = "cell";
           if (board[r][c] !== null) {
-            const colorIndex = board[r][c];
-            cell.style.backgroundImage = "url('fried_egg.png')";
-            cell.style.filter = `hue-rotate(${hueDegrees[colorIndex]}deg)`;
-          } else {
-            cell.style.backgroundImage = "none";
-            cell.style.filter = "none";
+            cell.classList.add("color" + board[r][c]);
           }
           boardDiv.appendChild(cell);
         }
@@ -379,8 +416,7 @@
         if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
           const idx = y * COLS + x;
           if (boardDiv.children[idx]) {
-            boardDiv.children[idx].style.backgroundImage = "url('fried_egg.png')";
-            boardDiv.children[idx].style.filter = `hue-rotate(${hueDegrees[pair[0]]}deg)`;
+            boardDiv.children[idx].classList.add("color" + pair[0]);
           }
         }
 
@@ -390,8 +426,7 @@
           if (py >= 0 && py < ROWS && x >= 0 && x < COLS) {
             const idx2 = py * COLS + x;
             if (boardDiv.children[idx2]) {
-              boardDiv.children[idx2].style.backgroundImage = "url('fried_egg.png')";
-              boardDiv.children[idx2].style.filter = `hue-rotate(${hueDegrees[pair[1]]}deg)`;
+              boardDiv.children[idx2].classList.add("color" + pair[1]);
             }
           }
         } else {
@@ -399,8 +434,7 @@
           if (y >= 0 && y < ROWS && px2 >= 0 && px2 < COLS) {
             const idx2 = y * COLS + px2;
             if (boardDiv.children[idx2]) {
-              boardDiv.children[idx2].style.backgroundImage = "url('fried_egg.png')";
-              boardDiv.children[idx2].style.filter = `hue-rotate(${hueDegrees[pair[1]]}deg)`;
+              boardDiv.children[idx2].classList.add("color" + pair[1]);
             }
           }
         }
@@ -411,9 +445,7 @@
       nextDiv.innerHTML = "";
       next.forEach(color => {
         const div = document.createElement("div");
-        div.className = "cell";
-        div.style.backgroundImage = "url('fried_egg.png')";
-        div.style.filter = `hue-rotate(${hueDegrees[color]}deg)`;
+        div.className = "cell color" + color;
         nextDiv.appendChild(div);
       });
     }
@@ -435,12 +467,14 @@
 
     function canPlaceCurrent(x, y, vertical) {
       if (x < 0 || x >= COLS) return false;
+      if (y < 0) return false;
       if (vertical) {
-        if (y < 1 || y >= ROWS) return false;
+        if (y >= ROWS) return false;
+        if (y - 1 < 0) return false;
         if (board[y][x] !== null) return false;
         if (board[y - 1][x] !== null) return false;
       } else {
-        if (y < 0 || y >= ROWS) return false;
+        if (y >= ROWS) return false;
         if (x + 1 >= COLS) return false;
         if (board[y][x] !== null) return false;
         if (board[y][x + 1] !== null) return false;
@@ -450,9 +484,7 @@
 
     function placeCurrent() {
       const { x, y, vertical, pair } = current;
-      // 主ぷよ設置
       board[y][x] = pair[0];
-      // ペアぷよ設置
       if (vertical) {
         board[y - 1][x] = pair[1];
       } else {
@@ -461,205 +493,214 @@
       current = null;
     }
 
-    function canMove(dx, dy, newVertical = null) {
-      if (!current) return false;
-      const x = current.x + dx;
-      const y = current.y + dy;
-      const vertical = newVertical === null ? current.vertical : newVertical;
-
-      return canPlaceCurrent(x, y, vertical);
+    function isEmpty(x, y) {
+      return y >= 0 && y < ROWS && x >= 0 && x < COLS && board[y][x] === null;
     }
 
-    function moveCurrent(dx, dy, newVertical = null) {
-      if (!canMove(dx, dy, newVertical)) return false;
-      current.x += dx;
-      current.y += dy;
-      if (newVertical !== null) current.vertical = newVertical;
-      return true;
-    }
-
-    // 落下処理
-    function drop() {
-      if (paused || isGameOver || clearing) return;
-      if (canMove(0, 1)) {
-        moveCurrent(0, 1);
-      } else {
-        placeCurrent();
-        clearChains();
-        if (!isGameOver) spawn();
+    // ぷよを1段下げる
+    function fallPuyos() {
+      let moved = false;
+      for (let r = ROWS - 2; r >= 0; r--) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c] !== null && board[r + 1][c] === null) {
+            board[r + 1][c] = board[r][c];
+            board[r][c] = null;
+            moved = true;
+          }
+        }
       }
-      drawBoard();
+      return moved;
     }
 
-    // ハードドロップ
-    function hardDrop() {
-      if (paused || isGameOver || clearing) return;
-      while (canMove(0, 1)) {
-        moveCurrent(0, 1);
-      }
-      placeCurrent();
-      clearChains();
-      if (!isGameOver) spawn();
-      drawBoard();
-    }
-
-    // 消去判定（4つ以上連結）
-    function clearChains() {
-      clearing = true;
+    // ぷよ消し処理（4連結以上を消す）
+    function clearPuyos() {
+      const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
       let toClear = [];
-      let visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
-
-      function dfs(r, c, color, group) {
-        if (
-          r < 0 || r >= ROWS || c < 0 || c >= COLS ||
-          visited[r][c] || board[r][c] !== color
-        ) return;
+      function dfs(r, c, color) {
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return [];
+        if (visited[r][c]) return [];
+        if (board[r][c] !== color) return [];
         visited[r][c] = true;
-        group.push([r, c]);
-        dfs(r + 1, c, color, group);
-        dfs(r - 1, c, color, group);
-        dfs(r, c + 1, color, group);
-        dfs(r, c - 1, color, group);
+        let group = [[r, c]];
+        [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr, dc]) => {
+          group = group.concat(dfs(r+dr, c+dc, color));
+        });
+        return group;
       }
-
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           if (board[r][c] !== null && !visited[r][c]) {
-            let group = [];
-            dfs(r, c, board[r][c], group);
-            if (group.length >= 4) toClear.push(...group);
+            const group = dfs(r, c, board[r][c]);
+            if (group.length >= 4) {
+              toClear = toClear.concat(group);
+            }
           }
         }
       }
+      if (toClear.length === 0) return false;
 
-      if (toClear.length === 0) {
-        clearing = false;
-        return;
-      }
-
-      // 消去アニメーション用に点滅を付ける
-      toClear.forEach(([r, c]) => {
-        const idx = r * COLS + c;
-        boardDiv.children[idx].classList.add("blink");
+      // 消す
+      toClear.forEach(([r,c]) => {
+        board[r][c] = null;
       });
 
-      // アニメーション後に消去
-      setTimeout(() => {
-        toClear.forEach(([r, c]) => {
-          board[r][c] = null;
-          const idx = r * COLS + c;
-          boardDiv.children[idx].classList.remove("blink");
-          boardDiv.children[idx].style.backgroundImage = "none";
-          boardDiv.children[idx].style.filter = "none";
-        });
-        applyGravity();
-        score += toClear.length * 10;
-        scoreSpan.textContent = score;
-        clearing = false;
-        drawBoard();
-        // 連鎖判定を繰り返す
-        clearChains();
-      }, 600);
+      score += toClear.length * 10;
+      scoreSpan.textContent = score;
+      return true;
     }
 
-    // 落下処理
-    function applyGravity() {
-      for (let c = 0; c < COLS; c++) {
-        let stack = [];
-        for (let r = ROWS - 1; r >= 0; r--) {
-          if (board[r][c] !== null) {
-            stack.push(board[r][c]);
-            board[r][c] = null;
-          }
-        }
-        for (let i = 0; i < stack.length; i++) {
-          board[ROWS - 1 - i][c] = stack[i];
-        }
-      }
-    }
-
-    // 操作ボタンのイベント設定
-    document.getElementById("btnLeft").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        moveCurrent(-1, 0);
-        drawBoard();
-      }
-    });
-    document.getElementById("btnRight").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        moveCurrent(1, 0);
-        drawBoard();
-      }
-    });
-    document.getElementById("btnDown").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        drop();
-      }
-    });
-    document.getElementById("btnUp").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        hardDrop();
-      }
-    });
-    document.getElementById("btnRotateLeft").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        rotatePuyo(false);
-        drawBoard();
-      }
-    });
-    document.getElementById("btnRotateRight").addEventListener("click", () => {
-      if (!paused && !isGameOver && !clearing) {
-        rotatePuyo(true);
-        drawBoard();
-      }
-    });
-
-    // キーボード操作対応
-    document.addEventListener("keydown", (e) => {
+    // ゲームループ（落下＆消去判定）
+    let dropInterval = null;
+    function gameLoop() {
       if (paused || isGameOver || clearing) return;
-      switch (e.key) {
-        case "ArrowLeft": moveCurrent(-1, 0); break;
-        case "ArrowRight": moveCurrent(1, 0); break;
-        case "ArrowDown": drop(); break;
-        case "ArrowUp": hardDrop(); break;
-        case "z": rotatePuyo(false); break; // 左回転
-        case "x": rotatePuyo(true); break;  // 右回転
+      if (!current) {
+        spawn();
+        drawBoard();
+        return;
+      }
+      // 下に空きがあれば落下
+      if (canMoveDown()) {
+        current.y++;
+      } else {
+        // 固定して消す判定
+        placeCurrent();
+        drawBoard();
+        clearing = true;
+        setTimeout(() => {
+          if (clearPuyos()) {
+            // 消したら落下して再チェック
+            while(fallPuyos()) {}
+            drawBoard();
+            setTimeout(() => {
+              clearing = false;
+              gameLoop();
+            }, 300);
+          } else {
+            clearing = false;
+            drawBoard();
+          }
+        }, 300);
+        return;
       }
       drawBoard();
-    });
+    }
 
-    // 回転処理
-    function rotatePuyo(clockwise) {
-      if (!current) return;
-      // 現在の状態
-      let { x, y, vertical, pair } = current;
-      let newVertical = vertical;
-      // 回転した場合のペアの位置を計算
-      // 反時計回転・時計回転の2通り
-
-      // 現在が縦なら横へ、横なら縦へ
-      newVertical = !vertical;
-
-      // 新しい配置の判定
-      if (canPlaceCurrent(x, y, newVertical)) {
-        current.vertical = newVertical;
+    function canMoveDown() {
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        if (y + 1 >= ROWS) return false;
+        if (board[y + 1][x] !== null) return false;
+        if (board[y][x] !== null) return false;
       } else {
-        // 回転できなければ無視
+        if (y + 1 >= ROWS) return false;
+        if (board[y + 1][x] !== null) return false;
+        if (board[y + 1][x + 1] !== null) return false;
+      }
+      return true;
+    }
+
+    // 横左右移動
+    function moveLeft() {
+      if (!current) return;
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        if (x - 1 < 0) return;
+        if (board[y][x-1] !== null) return;
+        if (board[y -1][x-1] !== null) return;
+        current.x--;
+        drawBoard();
+      } else {
+        if (x - 1 < 0) return;
+        if (board[y][x-1] !== null) return;
+        if (board[y][x] !== null) return;
+        current.x--;
+        drawBoard();
+      }
+    }
+    function moveRight() {
+      if (!current) return;
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        if (x + 1 >= COLS) return;
+        if (board[y][x+1] !== null) return;
+        if (board[y - 1][x + 1] !== null) return;
+        current.x++;
+        drawBoard();
+      } else {
+        if (x + 2 >= COLS) return;
+        if (board[y][x + 2] !== null) return;
+        if (board[y][x + 1] !== null) return;
+        current.x++;
+        drawBoard();
       }
     }
 
-    // 一時停止ボタン
-    pauseBtn.addEventListener("click", () => {
+    // 回転
+    function rotateLeft() {
+      if (!current) return;
+      const { x, y, vertical } = current;
+      if (vertical) {
+        // 縦 → 横
+        if (x + 1 >= COLS) return;
+        if (board[y][x + 1] !== null) return;
+        current.vertical = false;
+      } else {
+        // 横 → 縦
+        if (y - 1 < 0) return;
+        if (board[y - 1][x] !== null) return;
+        current.vertical = true;
+      }
+      drawBoard();
+    }
+    function rotateRight() {
+      // 右回転は左回転の逆操作でOK
+      rotateLeft();
+    }
+
+    // ハードドロップ（上ボタン）
+    function hardDrop() {
+      if (!current) return;
+      while (true) {
+        const { x, y, vertical } = current;
+        let canGoDown = false;
+        if (vertical) {
+          if (y + 1 < ROWS && board[y + 1][x] === null) {
+            canGoDown = true;
+          }
+        } else {
+          if (y + 1 < ROWS && board[y + 1][x] === null && board[y + 1][x + 1] === null) {
+            canGoDown = true;
+          }
+        }
+        if (canGoDown) {
+          current.y++;
+        } else {
+          break;
+        }
+      }
+      drawBoard();
+    }
+
+    // 操作ボタンのイベント登録
+    document.getElementById("btnLeft").addEventListener("click", () => { moveLeft(); });
+    document.getElementById("btnRight").addEventListener("click", () => { moveRight(); });
+    document.getElementById("btnDown").addEventListener("click", () => {
+      if (!current) return;
+      current.y++;
+      drawBoard();
+    });
+    document.getElementById("btnRotateLeft").addEventListener("click", () => { rotateLeft(); });
+    document.getElementById("btnRotateRight").addEventListener("click", () => { rotateRight(); });
+    document.getElementById("btnUp").addEventListener("click", () => { hardDrop(); });
+    document.getElementById("pauseBtn").addEventListener("click", () => {
       paused = !paused;
       pauseBtn.textContent = paused ? "再開" : "一時停止";
     });
-
-    // リスタートボタン
     document.getElementById("btnRestart").addEventListener("click", () => {
       resetGame();
-      gameOverOverlay.style.display = "none";
     });
 
+    // ゲームリセット
     function resetGame() {
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
@@ -669,24 +710,43 @@
       score = 0;
       scoreSpan.textContent = score;
       isGameOver = false;
+      clearing = false;
       paused = false;
-      pauseBtn.textContent = "一時停止";
       current = null;
       next = [randColor(), randColor()];
       drawNext();
-      spawn();
       drawBoard();
+      gameOverOverlay.style.display = "none";
     }
 
-    // ゲーム初期化
+    // ゲーム開始
     resetGame();
 
     // 自動落下タイマー
     setInterval(() => {
       if (!paused && !isGameOver && !clearing) {
-        drop();
+        if (current) {
+          if (canMoveDown()) {
+            current.y++;
+            drawBoard();
+          } else {
+            placeCurrent();
+            clearing = true;
+            setTimeout(() => {
+              if (clearPuyos()) {
+                while(fallPuyos()) {}
+                drawBoard();
+              }
+              clearing = false;
+            }, 300);
+          }
+        } else {
+          spawn();
+          drawBoard();
+        }
       }
-    }, 1000);
+    }, 800);
+
   </script>
 </body>
 </html>

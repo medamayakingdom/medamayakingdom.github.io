@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>おいしい目玉焼きの作り方 - v1.3</title>
+  <title>おいしい目玉焼きの作り方 - v1.4</title>
   <style>
     body {
       font-family: sans-serif;
@@ -60,45 +60,48 @@
     .cell {
       width: 40px;
       height: 40px;
-      background-size: cover;
+      background-size: contain;
       background-repeat: no-repeat;
       background-position: center;
       border: 1px solid #ccc;
       box-sizing: border-box;
       border-radius: 6px;
+      transition: opacity 0.3s ease;
+      background-image: url('fried_egg.png');
     }
-    .color0 { background-image: url('fried_egg.png'); filter: none; }
-    .color1 { background-image: url('fried_egg.png'); filter: hue-rotate(60deg); }
-    .color2 { background-image: url('fried_egg.png'); filter: hue-rotate(200deg); }
-    .color3 { background-image: url('fried_egg.png'); filter: hue-rotate(120deg); }
+    /* 色指定（真っ赤、真っ青、真みどり、真っ黄色） */
+    .color0 { filter: none; background-color: #ff0000; }    /* 真っ赤 */
+    .color1 { filter: none; background-color: #0000ff; }    /* 真っ青 */
+    .color2 { filter: none; background-color: #00cc00; }    /* 真みどり */
+    .color3 { filter: none; background-color: #ffff00; }    /* 真っ黄色 */
+
+    /* チカチカ用アニメーション */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .blink {
+      animation: blink 0.6s ease-in-out 3;
+    }
 
     /* 操作ボタン配置 */
     #controls {
       margin-top: 20px;
       display: flex;
       justify-content: center;
+      align-items: center;
       gap: 16px;
       flex-wrap: wrap;
-      align-items: center;
       user-select: none;
     }
-    /* 十字キーと回転ボタンのラッパー */
-    #directionalButtons {
+    #buttonGrid {
       display: grid;
       grid-template-columns: 40px 40px 40px;
       grid-template-rows: 40px 40px 40px;
       gap: 8px;
       user-select: none;
     }
-    /* 空セル */
-    #directionalButtons .empty {
-      pointer-events: none;
-      background: transparent;
-      border: none;
-      box-shadow: none;
-    }
-    /* 十字キーのボタン */
-    #directionalButtons button {
+    #buttonGrid button {
       background-color: #e67e22;
       border: none;
       color: white;
@@ -111,42 +114,29 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
       padding: 0;
       line-height: 1;
       width: 40px;
       height: 40px;
+      font-weight: bold;
     }
-    #directionalButtons button:hover {
+    #buttonGrid button:hover {
       background-color: #d35400;
     }
-
-    /* 回転ボタン */
-    #rotateButtons {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      user-select: none;
+    #buttonGrid .empty {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+      pointer-events: none;
     }
-    #rotateButtons button {
+    /* 回転ボタンの丸ボタン */
+    #btnRotateLeft, #btnRotateRight {
+      border-radius: 50%;
       width: 48px;
       height: 48px;
-      background-color: #e67e22;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      user-select: none;
+      font-size: 0;
     }
-    #rotateButtons button:hover {
-      background-color: #d35400;
-    }
-    /* 矢印のSVGスタイル */
+    /* SVGの色 */
     svg {
       fill: white;
       width: 24px;
@@ -154,10 +144,39 @@
       user-select: none;
     }
 
+    /* ゲームオーバー表示 */
+    #gameOverOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 2em;
+      z-index: 9999;
+      flex-direction: column;
+      user-select: none;
+    }
+    #gameOverOverlay button {
+      margin-top: 20px;
+      font-size: 1em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #e67e22;
+      color: white;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+    }
+    #gameOverOverlay button:hover {
+      background-color: #d35400;
+    }
   </style>
 </head>
 <body>
-  <h1>🍳 おいしい目玉焼きの作り方 - v1.3</h1>
+  <h1>🍳 おいしい目玉焼きの作り方 - v1.4</h1>
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
 
   <div class="section">
@@ -206,7 +225,7 @@
     <div id="puyoGame">
       <div>
         <div id="board"></div>
-        <div id="scoreArea">スコア: <span id="score">0</span></div>
+        <div id="scoreArea" style="margin-top:8px; font-weight:bold;">スコア: <span id="score">0</span></div>
       </div>
       <div>
         <p>NEXT</p>
@@ -214,35 +233,44 @@
       </div>
     </div>
     <div id="controls">
-      <div id="directionalButtons">
-        <button id="btnUp" title="ハードドロップ ↑">
-          <!-- 上矢印SVG -->
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
-          </svg>
-        </button>
-        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+      <div id="buttonGrid">
+        <!-- 左上: 反時計回転 -->
         <button id="btnRotateLeft" title="左回転 ⟲">
-          <!-- 左回転矢印SVG -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
             <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
           </svg>
         </button>
-
-        <button id="btnLeft" title="左 ←">←</button>
-        <button id="btnDown" title="下 ↓">↓</button>
-        <button id="btnRight" title="右 →">→</button>
-
-        <button class="empty" aria-hidden="true" tabindex="-1"></button>
-        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <!-- 上: ハードドロップ -->
+        <button id="btnUp" title="ハードドロップ ↑">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
+          </svg>
+        </button>
+        <!-- 右上: 時計回転 -->
         <button id="btnRotateRight" title="右回転 ⟳">
-          <!-- 右回転矢印SVG -->
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
             <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
           </svg>
         </button>
+
+        <!-- 左: 左 -->
+        <button id="btnLeft" title="左 ←">←</button>
+        <!-- 中央空白 -->
+        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <!-- 右: 右 -->
+        <button id="btnRight" title="右 →">→</button>
+
+        <!-- 真下: 下 -->
+        <button id="btnDown" title="下 ↓">↓</button>
       </div>
     </div>
+
+  </div>
+
+  <!-- ゲームオーバーオーバーレイ -->
+  <div id="gameOverOverlay" role="alert" aria-live="assertive">
+    <div>ゲームオーバー！</div>
+    <button id="btnRestart">リスタート</button>
   </div>
 
   <div class="footer">&copy; 2025 medamayakingdom</div>
@@ -278,38 +306,56 @@
     let current = null;
     let next = null;
     let score = 0;
+    let isGameOver = false;
 
     const boardDiv = document.getElementById("board");
     const nextDiv = document.getElementById("next");
     const scoreSpan = document.getElementById("score");
+    const gameOverOverlay = document.getElementById("gameOverOverlay");
 
+    // ブロックの描画
     function drawBoard() {
       boardDiv.innerHTML = "";
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           const cell = document.createElement("div");
           cell.className = "cell";
-          if (board[r][c] !== null) {
-            cell.classList.add("color" + board[r][c]);
-          }
+          if (board[r][c] !== null) cell.classList.add("color" + board[r][c]);
           boardDiv.appendChild(cell);
         }
       }
-      // 落下中のぷよも描画
+
+      // 落下中のぷよ描画
       if (current) {
-        const positions = current.vertical
-          ? [[current.y, current.x], [current.y - 1, current.x]]
-          : [[current.y, current.x], [current.y, current.x + 1]];
-        positions.forEach(([r, c], i) => {
-          if (r >= 0 && r < ROWS && c >= 0 && c < COLS) {
-            const cellIndex = r * COLS + c;
-            const cell = boardDiv.children[cellIndex];
-            cell.classList.add("color" + current.pair[i]);
+        const { x, y, vertical, pair } = current;
+        // 主ぷよ
+        if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
+          const idx = y * COLS + x;
+          boardDiv.children[idx].classList.add("color" + pair[0]);
+        }
+        // ペアぷよ（縦横で位置違う）
+        let px = x;
+        let py = y + (vertical ? -1 : 0);
+        let px2 = x + (vertical ? 0 : 1);
+        let py2 = y + (vertical ? -1 : 0);
+
+        if (vertical) py = y - 1;
+        else py = y;
+
+        if (py >= 0 && py < ROWS && px >= 0 && px < COLS) {
+          boardDiv.children[py * COLS + px].classList.add("color" + pair[1]);
+        }
+
+        if (!vertical) {
+          const pxr = x + 1;
+          if (py >= 0 && py < ROWS && pxr >= 0 && pxr < COLS) {
+            boardDiv.children[py * COLS + pxr].classList.add("color" + pair[1]);
           }
-        });
+        }
       }
     }
 
+    // ネクストぷよ描画
     function drawNext() {
       nextDiv.innerHTML = "";
       next.forEach(color => {
@@ -319,67 +365,69 @@
       });
     }
 
+    // ランダム色取得
     function randColor() {
       return colors[Math.floor(Math.random() * colors.length)];
     }
 
+    // 新しいぷよを生成
     function spawn() {
-      if (!next) {
-        next = [randColor(), randColor()];
-      }
-      current = { x: 2, y: 0, vertical: true, pair: next };
+      current = { x: 2, y: 1, vertical: true, pair: [...next] };
       next = [randColor(), randColor()];
       drawNext();
+      if (!canPlaceCurrent(current.x, current.y, current.vertical)) {
+        // ゲームオーバー
+        isGameOver = true;
+        gameOverOverlay.style.display = "flex";
+      }
     }
 
+    // ぷよの置ける場所チェック
     function canPlaceCurrent(x, y, vertical) {
+      if (x < 0 || x >= COLS) return false;
       if (vertical) {
-        if (
-          x < 0 || x >= COLS ||
-          y < 1 || y >= ROWS ||
-          board[y][x] !== null ||
-          board[y - 1][x] !== null
-        ) return false;
+        if (y < 1 || y >= ROWS) return false;
+        if (board[y][x] !== null) return false;
+        if (board[y - 1][x] !== null) return false;
       } else {
-        if (
-          x < 0 || x + 1 >= COLS ||
-          y < 0 || y >= ROWS ||
-          board[y][x] !== null ||
-          board[y][x + 1] !== null
-        ) return false;
+        if (y < 0 || y >= ROWS) return false;
+        if (x + 1 >= COLS) return false;
+        if (board[y][x] !== null) return false;
+        if (board[y][x + 1] !== null) return false;
       }
       return true;
     }
 
+    // ぷよ固定
     function placeCurrent() {
-      const positions = current.vertical
-        ? [[current.y, current.x], [current.y - 1, current.x]]
-        : [[current.y, current.x], [current.y, current.x + 1]];
-      positions.forEach(([r, c], i) => {
-        board[r][c] = current.pair[i];
-      });
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        board[y][x] = pair[0];
+        board[y - 1][x] = pair[1];
+      } else {
+        board[y][x] = pair[0];
+        board[y][x + 1] = pair[1];
+      }
+      current = null;
     }
 
+    // マッチング＆消去（4個以上繋がったもの）
     function clearMatches() {
       const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
       let toClear = [];
 
       function dfs(r, c, color) {
-        let stack = [[r, c]];
-        let group = [];
-        while (stack.length > 0) {
-          const [cr, cc] = stack.pop();
-          if (
-            cr < 0 || cr >= ROWS || cc < 0 || cc >= COLS ||
-            visited[cr][cc] || board[cr][cc] !== color
-          ) continue;
-          visited[cr][cc] = true;
-          group.push([cr, cc]);
-          stack.push([cr - 1, cc]);
-          stack.push([cr + 1, cc]);
-          stack.push([cr, cc - 1]);
-          stack.push([cr, cc + 1]);
-        }
+        if (
+          r < 0 || r >= ROWS || c < 0 || c >= COLS ||
+          visited[r][c] || board[r][c] !== color
+        ) return [];
+
+        visited[r][c] = true;
+        let group = [[r, c]];
+        group = group.concat(dfs(r + 1, c, color));
+        group = group.concat(dfs(r - 1, c, color));
+        group = group.concat(dfs(r, c + 1, color));
+        group = group.concat(dfs(r, c - 1, color));
         return group;
       }
 
@@ -394,19 +442,32 @@
         }
       }
 
+      if (toClear.length === 0) return false;
+
+      // チカチカアニメーション付与
       toClear.forEach(([r, c]) => {
-        board[r][c] = null;
+        const idx = r * COLS + c;
+        const cell = boardDiv.children[idx];
+        cell.classList.add("blink");
       });
 
-      if (toClear.length > 0) {
+      // 600ms後に消去処理
+      setTimeout(() => {
+        toClear.forEach(([r, c]) => {
+          board[r][c] = null;
+          const idx = r * COLS + c;
+          boardDiv.children[idx].classList.remove("blink");
+        });
         score += toClear.length * 10;
         scoreSpan.innerText = score;
         applyGravity();
-        return true;
-      }
-      return false;
+        drawBoard();
+      }, 600);
+
+      return true;
     }
 
+    // 重力（ぷよを下に落とす）
     function applyGravity() {
       for (let c = 0; c < COLS; c++) {
         for (let r = ROWS - 2; r >= 0; r--) {
@@ -422,7 +483,12 @@
       }
     }
 
+    // ゲームループ・tick関数
+    let clearing = false; // 消去アニメーション中は待つ
     function tick() {
+      if (isGameOver) return;
+      if (clearing) return;
+
       if (!current) {
         spawn();
         drawBoard();
@@ -432,37 +498,59 @@
         current.y++;
       } else {
         placeCurrent();
-        while (clearMatches()) {}
-        spawn();
+        clearing = true;
+        const cleared = clearMatches();
+        if (!cleared) {
+          clearing = false;
+          spawn();
+        } else {
+          setTimeout(() => {
+            clearing = false;
+            spawn();
+          }, 700);
+        }
       }
       drawBoard();
     }
 
     // 操作関数
     function moveLeft() {
+      if (isGameOver) return;
       if (current && canPlaceCurrent(current.x - 1, current.y, current.vertical)) {
         current.x--;
         drawBoard();
       }
     }
     function moveRight() {
+      if (isGameOver) return;
       if (current && canPlaceCurrent(current.x + 1, current.y, current.vertical)) {
         current.x++;
         drawBoard();
       }
     }
     function moveDown() {
+      if (isGameOver) return;
       if (current && canPlaceCurrent(current.x, current.y + 1, current.vertical)) {
         current.y++;
         drawBoard();
       } else if (current) {
         placeCurrent();
-        while (clearMatches()) {}
-        spawn();
+        clearing = true;
+        const cleared = clearMatches();
+        if (!cleared) {
+          clearing = false;
+          spawn();
+        } else {
+          setTimeout(() => {
+            clearing = false;
+            spawn();
+          }, 700);
+        }
         drawBoard();
       }
     }
     function rotateRight() {
+      if (isGameOver) return;
       if (!current) return;
       const newVertical = !current.vertical;
       if (canPlaceCurrent(current.x, current.y, newVertical)) {
@@ -481,9 +569,9 @@
       drawBoard();
     }
     function rotateLeft() {
+      if (isGameOver) return;
       if (!current) return;
       const newVertical = !current.vertical;
-      // 左回転は右回転の逆の動きをするイメージでOK
       if (canPlaceCurrent(current.x, current.y, newVertical)) {
         current.vertical = newVertical;
       } else if (!newVertical) {
@@ -499,18 +587,44 @@
       }
       drawBoard();
     }
-
-    // ハードドロップ
     function hardDrop() {
+      if (isGameOver) return;
       if (!current) return;
       while (canPlaceCurrent(current.x, current.y + 1, current.vertical)) {
         current.y++;
       }
       placeCurrent();
-      while (clearMatches()) {}
-      spawn();
+      clearing = true;
+      const cleared = clearMatches();
+      if (!cleared) {
+        clearing = false;
+        spawn();
+      } else {
+        setTimeout(() => {
+          clearing = false;
+          spawn();
+        }, 700);
+      }
       drawBoard();
     }
+
+    // リスタートボタン処理
+    document.getElementById("btnRestart").addEventListener("click", () => {
+      for(let r=0; r<ROWS; r++) {
+        for(let c=0; c<COLS; c++) {
+          board[r][c] = null;
+        }
+      }
+      score = 0;
+      scoreSpan.innerText = score;
+      isGameOver = false;
+      gameOverOverlay.style.display = "none";
+      current = null;
+      next = [randColor(), randColor()];
+      drawNext();
+      spawn();
+      drawBoard();
+    });
 
     // ボタンイベント登録
     document.getElementById("btnLeft").addEventListener("click", moveLeft);
@@ -521,9 +635,13 @@
     document.getElementById("btnUp").addEventListener("click", hardDrop);
 
     // 初期化
+    next = [randColor(), randColor()];
+    drawNext();
     spawn();
     drawBoard();
     setInterval(tick, 700);
   </script>
+
+  <div class="footer">&copy; 2025 medamayakingdom</div>
 </body>
 </html>

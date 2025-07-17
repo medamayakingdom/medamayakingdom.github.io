@@ -169,11 +169,11 @@
       }
     }
 
-    // 目玉焼きぷよぷよゲーム用（表示＋簡易ロジック）
+    // 目玉焼きぷよぷよゲーム用
 
     const ROWS = 12;
     const COLS = 6;
-    const COLORS = [0,1,2,3]; // 4色
+    const COLORS = [0, 1, 2, 3]; // 赤・黄・青・濃緑
     const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
     let current = null;
     let next = [randColor(), randColor()];
@@ -189,12 +189,36 @@
 
     function drawBoard() {
       boardDiv.innerHTML = "";
-      for(let r=0; r<ROWS; r++) {
-        for(let c=0; c<COLS; c++) {
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
           const cell = document.createElement("div");
           cell.classList.add("cell");
-          if(board[r][c] !== null) {
+          // 盤面にあるぷよを表示
+          if (board[r][c] !== null) {
             cell.classList.add("color" + board[r][c]);
+          }
+          // 落下中のぷよも描画（盤面に入っているセルは上書きしない）
+          if (current !== null) {
+            const cx = current.x;
+            const cy = current.y;
+            const [p1, p2] = current.pair;
+            if (current.vertical) {
+              // 縦向きの場合、上のぷよがy-1にある
+              if (r === cy && c === cx) {
+                cell.classList.add("color" + p1);
+              }
+              if (r === cy - 1 && c === cx) {
+                cell.classList.add("color" + p2);
+              }
+            } else {
+              // 横向きの場合、右のぷよがx+1にある
+              if (r === cy && c === cx) {
+                cell.classList.add("color" + p1);
+              }
+              if (r === cy && c === cx + 1) {
+                cell.classList.add("color" + p2);
+              }
+            }
           }
           boardDiv.appendChild(cell);
         }
@@ -205,7 +229,7 @@
       nextDiv.innerHTML = "";
       next.forEach(color => {
         const cell = document.createElement("div");
-        cell.classList.add("cell", "color"+color);
+        cell.classList.add("cell", "color" + color);
         nextDiv.appendChild(cell);
       });
     }
@@ -217,27 +241,27 @@
     }
 
     function canMove(x, y) {
-      if(y < 0 || y >= ROWS) return false;
-      if(x < 0 || x >= COLS) return false;
-      if(board[y][x] !== null) return false;
+      if (y < 0 || y >= ROWS) return false;
+      if (x < 0 || x >= COLS) return false;
+      if (board[y][x] !== null) return false;
       return true;
     }
 
     function canPlaceCurrent(newX, newY, vertical) {
-      if(vertical) {
-        return canMove(newX, newY) && canMove(newX, newY-1);
+      if (vertical) {
+        return canMove(newX, newY) && canMove(newX, newY - 1);
       } else {
-        return canMove(newX, newY) && canMove(newX+1, newY);
+        return canMove(newX, newY) && canMove(newX + 1, newY);
       }
     }
 
     function placeCurrent() {
-      if(current.vertical) {
+      if (current.vertical) {
         board[current.y][current.x] = current.pair[0];
-        board[current.y-1][current.x] = current.pair[1];
+        board[current.y - 1][current.x] = current.pair[1];
       } else {
         board[current.y][current.x] = current.pair[0];
-        board[current.y][current.x+1] = current.pair[1];
+        board[current.y][current.x + 1] = current.pair[1];
       }
     }
 
@@ -246,138 +270,124 @@
       let toClear = [];
 
       function dfs(r, c, color) {
-        if(r < 0 || r >= ROWS || c < 0 || c >= COLS) return [];
-        if(visited[r][c]) return [];
-        if(board[r][c] !== color) return [];
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return [];
+        if (visited[r][c]) return [];
+        if (board[r][c] !== color) return [];
         visited[r][c] = true;
         let group = [[r, c]];
-        group = group.concat(dfs(r+1,c,color));
-        group = group.concat(dfs(r-1,c,color));
-        group = group.concat(dfs(r,c+1,color));
-        group = group.concat(dfs(r,c-1,color));
+        group = group.concat(dfs(r + 1, c, color));
+        group = group.concat(dfs(r - 1, c, color));
+        group = group.concat(dfs(r, c + 1, color));
+        group = group.concat(dfs(r, c - 1, color));
         return group;
       }
 
-      for(let r=0; r<ROWS; r++) {
-        for(let c=0; c<COLS; c++) {
-          if(board[r][c] !== null && !visited[r][c]) {
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c] !== null && !visited[r][c]) {
             let group = dfs(r, c, board[r][c]);
-            if(group.length >= 4) toClear.push(...group);
+            if (group.length >= 4) {
+              toClear = toClear.concat(group);
+            }
           }
         }
       }
 
-      if(toClear.length > 0) {
-        toClear.forEach(([r,c]) => board[r][c] = null);
+      toClear.forEach(([r, c]) => {
+        board[r][c] = null;
+      });
+
+      if (toClear.length > 0) {
         score += toClear.length * 10;
-        scoreSpan.innerText = score;
+        scoreSpan.textContent = score;
+        dropPuyos();
         return true;
       }
       return false;
     }
 
-    function dropBlocks() {
-      for(let c=0; c<COLS; c++) {
-        for(let r=ROWS-2; r>=0; r--) {
-          if(board[r][c] !== null) {
-            let nr = r;
-            while(nr + 1 < ROWS && board[nr+1][c] === null) {
-              board[nr+1][c] = board[nr][c];
+    function dropPuyos() {
+      for (let c = 0; c < COLS; c++) {
+        for (let r = ROWS - 1; r >= 0; r--) {
+          if (board[r][c] === null) {
+            // 上にぷよを探す
+            let nr = r - 1;
+            while (nr >= 0 && board[nr][c] === null) nr--;
+            if (nr >= 0) {
+              board[r][c] = board[nr][c];
               board[nr][c] = null;
-              nr++;
             }
           }
         }
       }
     }
 
-    function gameTick() {
-      if(current === null) {
+    function tick() {
+      if (!current) {
         spawn();
+      }
+      // 下に移動可能なら落下
+      if (canPlaceCurrent(current.x, current.y + 1, current.vertical)) {
+        current.y++;
       } else {
-        // 下に移動できるか？
-        let newY = current.y + 1;
-        if(current.vertical) {
-          if(canMove(current.x, newY) && canMove(current.x, newY - 1)) {
-            current.y = newY;
-          } else {
-            placeCurrent();
-            let cleared = true;
-            while(cleared) {
-              dropBlocks();
-              cleared = clearMatches();
-            }
-            current = null;
-          }
-        } else {
-          if(canMove(current.x, newY)) {
-            if(canMove(current.x + 1, newY)) {
-              current.y = newY;
-            } else {
-              placeCurrent();
-              let cleared = true;
-              while(cleared) {
-                dropBlocks();
-                cleared = clearMatches();
-              }
-              current = null;
-            }
-          } else {
-            placeCurrent();
-            let cleared = true;
-            while(cleared) {
-              dropBlocks();
-              cleared = clearMatches();
-            }
-            current = null;
-          }
-        }
+        placeCurrent();
+        // 消去判定を連続で処理
+        while (clearMatches()) {}
+        spawn();
       }
       drawBoard();
     }
 
-    function rotateCurrent() {
-      if(current === null) return;
-      const {x, y, vertical} = current;
-      if(vertical) {
-        // 縦→横
-        if(canPlaceCurrent(x, y, false)) {
-          current.vertical = false;
-        }
-      } else {
-        // 横→縦
-        if(canPlaceCurrent(x, y, true)) {
-          current.vertical = true;
-        }
-      }
-    }
+    document.addEventListener("keydown", e => {
+      if (!current) return;
 
-    document.addEventListener("keydown", (e) => {
-      if(current === null) return;
-      switch(e.key) {
+      switch (e.key) {
         case "ArrowLeft":
-          if(canPlaceCurrent(current.x - 1, current.y, current.vertical)) {
+          if (canPlaceCurrent(current.x - 1, current.y, current.vertical)) {
             current.x--;
           }
           break;
         case "ArrowRight":
-          if(canPlaceCurrent(current.x + 1, current.y, current.vertical)) {
+          if (canPlaceCurrent(current.x + 1, current.y, current.vertical)) {
             current.x++;
           }
           break;
         case "ArrowDown":
-          gameTick();
+          if (canPlaceCurrent(current.x, current.y + 1, current.vertical)) {
+            current.y++;
+          }
           break;
-        case "ArrowUp":
-          rotateCurrent();
+        case "z":
+        case "Z":
+          // 回転（縦⇔横）
+          let newVertical = !current.vertical;
+          // 回転位置の調整
+          if (newVertical) {
+            // 横→縦 回転は上方向へ
+            if (!canPlaceCurrent(current.x, current.y, newVertical)) {
+              if (canPlaceCurrent(current.x, current.y - 1, newVertical)) {
+                current.y--;
+              }
+            }
+          } else {
+            // 縦→横 回転は右方向へ
+            if (!canPlaceCurrent(current.x, current.y, newVertical)) {
+              if (canPlaceCurrent(current.x + 1, current.y, newVertical)) {
+                current.x++;
+              }
+            }
+          }
+          if (canPlaceCurrent(current.x, current.y, newVertical)) {
+            current.vertical = newVertical;
+          }
           break;
       }
       drawBoard();
     });
 
+    // ゲームスタート
     drawNext();
-    drawBoard();
-    setInterval(gameTick, 800);
+    setInterval(tick, 700);
   </script>
 </body>
 </html>

@@ -1,213 +1,177 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
-  <title>おいしい目玉焼きの作り方</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ぷよぷよ風ゲーム</title>
   <style>
     body {
+      background-color: #f4f4f4;
       font-family: sans-serif;
-      background-color: #fffbea;
-      color: #333;
-      padding: 2em;
-      line-height: 1.8;
-      text-align: center;
-    }
-    h1 {
-      color: #e67e22;
-    }
-    .egg-img {
-      display: block;
-      margin: 20px auto;
-      width: 200px;
-    }
-    .section {
-      margin-bottom: 2em;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.9em;
-      color: #777;
-      margin-top: 3em;
-    }
-    #puyoGame {
       display: flex;
-      justify-content: center;
-      gap: 30px;
-      margin-top: 30px;
+      flex-direction: column;
+      align-items: center;
     }
-    #board, #next {
-      display: grid;
-      grid-template-columns: repeat(6, 40px);
-      grid-auto-rows: 40px;
-      gap: 2px;
-      background-color: #ccc;
-      padding: 4px;
-      border: 3px solid #444;
+    canvas {
+      border: 2px solid #333;
+      background-color: #000;
+      margin-top: 20px;
+    }
+    #scoreboard {
+      margin-top: 10px;
+      font-size: 18px;
     }
     #next {
-      grid-template-columns: repeat(2, 40px);
+      margin-top: 10px;
     }
-    .cell {
-      width: 40px;
-      height: 40px;
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-      border: 1px solid #999;
-    }
-    .color0 { background-image: url('egg_red.png'); }
-    .color1 { background-image: url('egg_yellow.png'); }
-    .color2 { background-image: url('egg_blue.png'); }
-    .color3 { background-image: url('egg_green.png'); }
   </style>
 </head>
 <body>
-  <h1>🍳 おいしい目玉焼きの作り方</h1>
-  <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
-
-  <div class="section">
-    <h2>料理方法</h2>
-    <p>...ここは省略...</p>
-  </div>
-
-  <div class="section">
-    <h2>🥚 目玉焼き数えゲーム</h2>
-    <button onclick="startCountGame()">スタート</button>
-    <div id="eggContainer"></div>
-    <input type="number" id="answer" />
-    <button onclick="checkCountAnswer()">答える</button>
-    <p id="result"></p>
-  </div>
-
-  <div class="section">
-    <h2>🥚 目玉焼きぷよぷよ</h2>
-    <p>矢印キーで操作。スコア表示、NEXT表示付き</p>
-    <div id="puyoGame">
-      <div>
-        <div id="board"></div>
-        <p>スコア: <span id="score">0</span></p>
-      </div>
-      <div>
-        <p>NEXT</p>
-        <div id="next"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="footer">&copy; 2025 medamayakingdom</div>
-
+  <h1>ぷよぷよ風ゲーム</h1>
+  <canvas id="gameCanvas" width="240" height="480"></canvas>
+  <div id="scoreboard">スコア: <span id="score">0</span></div>
+  <div id="next">NEXT: <canvas id="nextCanvas" width="80" height="80"></canvas></div>
   <script>
-    let correctCount = 0;
-    function startCountGame() {
-      const container = document.getElementById("eggContainer");
-      container.innerHTML = "";
-      correctCount = Math.floor(Math.random() * 6) + 5;
-      for (let i = 0; i < correctCount; i++) {
-        const img = document.createElement("img");
-        img.src = "fried_egg.png";
-        img.style.width = "60px";
-        img.style.margin = "5px";
-        container.appendChild(img);
-      }
-      document.getElementById("result").innerText = "";
-    }
-    function checkCountAnswer() {
-      const userAnswer = parseInt(document.getElementById("answer").value);
-      const result = document.getElementById("result");
-      result.innerText = userAnswer === correctCount ? "🎉 正解。" : `残念。正解は ${correctCount}`;
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+    const nextCanvas = document.getElementById("nextCanvas");
+    const nextCtx = nextCanvas.getContext("2d");
+
+    const ROWS = 12;
+    const COLS = 6;
+    const BLOCK_SIZE = 40;
+    const COLORS = ["#e61919", "#f1c40f", "#3498db", "#228B22"];
+
+    let field = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    let score = 0;
+
+    function getRandomColor() {
+      return COLORS[Math.floor(Math.random() * COLORS.length)];
     }
 
-    const rows = 12;
-    const cols = 6;
-    const board = Array.from({ length: rows }, () => Array(cols).fill(null));
-    let current, next, score = 0;
-    const colors = [0, 1, 2, 3];
+    function drawBlock(x, y, color, context = ctx) {
+      context.fillStyle = color;
+      context.fillRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+      context.strokeStyle = "#333";
+      context.strokeRect(x * BLOCK_SIZE, y * BLOCK_SIZE, BLOCK_SIZE, BLOCK_SIZE);
+    }
 
-    const boardDiv = document.getElementById("board");
-    const nextDiv = document.getElementById("next");
-    const scoreSpan = document.getElementById("score");
-
-    function drawBoard() {
-      boardDiv.innerHTML = "";
-      for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          if (board[r][c] != null) cell.classList.add("color" + board[r][c]);
-          boardDiv.appendChild(cell);
+    function drawField() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          if (field[y][x]) {
+            drawBlock(x, y, field[y][x]);
+          }
         }
       }
-      if (current) {
-        const i = (current.y * cols) + current.x;
-        const pairI = ((current.y - 1) * cols) + current.x;
-        const cells = boardDiv.children;
-        if (cells[i]) cells[i].classList.add("color" + current.pair[0]);
-        if (current.y > 0 && cells[pairI]) cells[pairI].classList.add("color" + current.pair[1]);
-      }
+    }
+
+    let current = {
+      x: 2,
+      y: 0,
+      blocks: [getRandomColor(), getRandomColor()]
+    };
+
+    let next = [getRandomColor(), getRandomColor()];
+
+    function drawCurrent() {
+      drawBlock(current.x, current.y, current.blocks[0]);
+      drawBlock(current.x, current.y - 1, current.blocks[1]);
     }
 
     function drawNext() {
-      nextDiv.innerHTML = "";
-      next.forEach(color => {
-        const div = document.createElement("div");
-        div.className = "cell color" + color;
-        nextDiv.appendChild(div);
-      });
+      nextCtx.clearRect(0, 0, nextCanvas.width, nextCanvas.height);
+      drawBlock(1, 1, next[0], nextCtx);
+      drawBlock(1, 0, next[1], nextCtx);
     }
 
-    function spawn() {
-      current = { x: 2, y: 0, pair: [...next] };
-      next = [randColor(), randColor()];
+    function moveDown() {
+      if (canMove(current.x, current.y + 1)) {
+        current.y++;
+      } else {
+        fixToField();
+        clearMatches();
+        spawnNew();
+      }
+    }
+
+    function canMove(x, y) {
+      return (
+        y < ROWS &&
+        (!field[y] || !field[y][x]) &&
+        (!field[y - 1] || !field[y - 1][x])
+      );
+    }
+
+    function fixToField() {
+      field[current.y][current.x] = current.blocks[0];
+      if (current.y - 1 >= 0) {
+        field[current.y - 1][current.x] = current.blocks[1];
+      }
+    }
+
+    function spawnNew() {
+      current = {
+        x: 2,
+        y: 0,
+        blocks: next
+      };
+      next = [getRandomColor(), getRandomColor()];
       drawNext();
     }
 
-    function randColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    function tick() {
-      if (!current) spawn();
-      if (canMove(0, 1)) {
-        current.y++;
-      } else {
-        place();
-        clearLines();
-        spawn();
+    function clearMatches() {
+      let toClear = [];
+      for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+          let color = field[y][x];
+          if (!color) continue;
+          let group = getConnectedBlocks(x, y, color);
+          if (group.length >= 4) {
+            toClear.push(...group);
+          }
+        }
       }
-      drawBoard();
+
+      if (toClear.length > 0) {
+        for (let [x, y] of toClear) {
+          field[y][x] = null;
+        }
+        score += toClear.length * 10;
+        document.getElementById("score").textContent = score;
+      }
     }
 
-    function canMove(dx, dy) {
-      const x = current.x;
-      const y = current.y;
-      return y + dy < rows && board[y + dy][x] === null;
+    function getConnectedBlocks(x, y, color, visited = {}) {
+      const key = `${x},${y}`;
+      if (visited[key] || x < 0 || x >= COLS || y < 0 || y >= ROWS) return [];
+      if (field[y][x] !== color) return [];
+
+      visited[key] = true;
+      let blocks = [[x, y]];
+      blocks = blocks.concat(getConnectedBlocks(x + 1, y, color, visited));
+      blocks = blocks.concat(getConnectedBlocks(x - 1, y, color, visited));
+      blocks = blocks.concat(getConnectedBlocks(x, y + 1, color, visited));
+      blocks = blocks.concat(getConnectedBlocks(x, y - 1, color, visited));
+      return blocks;
     }
 
-    function place() {
-      board[current.y][current.x] = current.pair[0];
-      if (current.y - 1 >= 0) board[current.y - 1][current.x] = current.pair[1];
+    function gameLoop() {
+      drawField();
+      drawCurrent();
+      moveDown();
     }
 
-    function clearLines() {
-      score += 10;
-      scoreSpan.innerText = score;
-    }
+    setInterval(gameLoop, 500);
 
     document.addEventListener("keydown", e => {
-      if (!current) return;
       if (e.key === "ArrowLeft" && current.x > 0) current.x--;
-      if (e.key === "ArrowRight" && current.x < cols - 1) current.x++;
-      if (e.key === "ArrowDown") tick();
-      drawBoard();
+      if (e.key === "ArrowRight" && current.x < COLS - 1) current.x++;
+      if (e.key === "ArrowDown") moveDown();
     });
 
-    next = [randColor(), randColor()];
     drawNext();
-    setInterval(tick, 1000);
   </script>
 </body>
 </html>

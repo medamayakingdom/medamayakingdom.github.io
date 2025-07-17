@@ -2,7 +2,6 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
   <title>おいしい目玉焼きの作り方 - v1.5</title>
   <style>
     body {
@@ -61,29 +60,24 @@
       border-radius: 8px;
       background: #fffbea;
       box-shadow: 0 0 8px rgba(230, 126, 34, 0.3);
-      width: fit-content;
+      position: relative;
     }
     #next {
       grid-template-columns: repeat(2, 40px);
+      width: fit-content;
       padding: 6px;
     }
-.cell {
-  width: 40px;
-  height: 40px;
-  border: 1px solid #ccc;
-  box-sizing: border-box;
-  border-radius: 6px;
-  background: white;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.color0 { background-image: url('fried_egg.png'); filter: hue-rotate(0deg); }
-.color1 { background-image: url('fried_egg.png'); filter: hue-rotate(210deg); }
-.color2 { background-image: url('fried_egg.png'); filter: hue-rotate(90deg); }
-.color3 { background-image: url('fried_egg.png'); filter: hue-rotate(45deg); }
-
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      border-radius: 6px;
+      transition: opacity 0.3s ease;
+      background: white; /* 空白セルは白背景 */
+      position: relative;
+    }
+    /* 色指定は使わず画像で目玉焼き表示 */
 
     /* チカチカ用アニメーション */
     @keyframes blink {
@@ -202,50 +196,27 @@
       background-color: #1f6391;
     }
 
-    /* -------- スマホ対応のレスポンシブ調整 -------- */
-    @media (max-width: 480px) {
-      body {
-        padding: 1em;
-      }
-      #puyoGame {
-        flex-direction: column;
-        align-items: center;
-        gap: 20px;
-      }
-      #board, #next {
-        grid-template-columns: repeat(6, 24px);
-        grid-auto-rows: 24px;
-        gap: 1.5px;
-      }
-      .cell {
-        width: 24px;
-        height: 24px;
-        border-radius: 4px;
-        border: 1px solid #ccc;
-      }
-      #buttonGrid {
-        grid-template-columns: repeat(3, 36px);
-        grid-template-rows: repeat(3, 36px);
-        gap: 6px;
-      }
-      #buttonGrid button {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
-      }
-      #btnRotateLeft, #btnRotateRight {
-        width: 40px;
-        height: 40px;
-      }
-      #pauseBtn {
-        padding: 6px 12px;
-        font-size: 0.9em;
-      }
+    /* ぷよ画像（目玉焼き）をセルに絶対配置 */
+    .puyo-img {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 36px;
+      height: 36px;
+      pointer-events: none;
+      user-select: none;
+      filter: hue-rotate(0deg);
+      transition: filter 0.3s ease;
     }
+    /* 色ごとのフィルター */
+    .color0 { filter: hue-rotate(0deg); }    /* 赤 */
+    .color1 { filter: hue-rotate(210deg); }  /* 青 */
+    .color2 { filter: hue-rotate(90deg); }   /* 緑 */
+    .color3 { filter: hue-rotate(50deg); }   /* 黄 */
   </style>
 </head>
 <body>
-  <div id="accessInfo">アクセス数：読み込み中… 最終アクセス：取得中…</div>
+  <div id="accessInfo">アクセス数：読み込み中…</div>
 
   <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
@@ -306,40 +277,29 @@
     </div>
     <div id="controls">
       <div id="buttonGrid">
-        <!-- 左上: 反時計回転 -->
         <button id="btnRotateLeft" title="左回転 ⟲">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
             <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
           </svg>
         </button>
-        <!-- 上: ハードドロップ -->
         <button id="btnUp" title="ハードドロップ ↑">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
             <path d="M12 4l-8 8h5v8h6v-8h5z"/>
           </svg>
         </button>
-        <!-- 右上: 時計回転 -->
         <button id="btnRotateRight" title="右回転 ⟳">
           <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
             <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
           </svg>
         </button>
-
-        <!-- 左: 左 -->
         <button id="btnLeft" title="左 ←">←</button>
-        <!-- 中央空白 -->
         <button class="empty" aria-hidden="true" tabindex="-1"></button>
-        <!-- 右: 右 -->
         <button id="btnRight" title="右 →">→</button>
-
-        <!-- 真下: 下 -->
         <button id="btnDown" title="下 ↓">↓</button>
       </div>
     </div>
-
   </div>
 
-  <!-- ゲームオーバーオーバーレイ -->
   <div id="gameOverOverlay" role="alert" aria-live="assertive">
     <div>ゲームオーバー！</div>
     <button id="btnRestart">リスタート</button>
@@ -348,15 +308,15 @@
   <div class="footer">&copy; 2025 medamayakingdom</div>
 
   <script>
-    // アクセス数と最終アクセスの簡易表示（例：外部APIから取得）
-    // ※実際はAPIが必要。ここはダミー表示。
-    function fetchAccessInfo() {
-      // 例として乱数を使うだけのダミー処理です
-      const accessCount = Math.floor(Math.random() * 1000000);
-      const lastAccess = new Date(Date.now() - Math.random() * 3600 * 1000).toLocaleString();
-      document.getElementById('accessInfo').textContent = `アクセス数：${accessCount.toLocaleString()} 最終アクセス：${lastAccess}`;
+    // アクセス数をブラウザ単位でカウントして表示（簡易版）
+    function updateAccessCount() {
+      let count = localStorage.getItem('my_access_count');
+      count = count ? parseInt(count) : 0;
+      count++;
+      localStorage.setItem('my_access_count', count);
+      document.getElementById('accessInfo').textContent = `あなたのこのブラウザでのアクセス数：${count}`;
     }
-    fetchAccessInfo();
+    updateAccessCount();
 
     // Count Game
     let correctCount = 0;
@@ -398,6 +358,9 @@
     const gameOverOverlay = document.getElementById("gameOverOverlay");
     const pauseBtn = document.getElementById("pauseBtn");
 
+    // ぷよの目玉焼き画像URL
+    const puyoImgSrc = "fried_egg.png";
+
     function drawBoard() {
       boardDiv.innerHTML = "";
       for (let r = 0; r < ROWS; r++) {
@@ -405,7 +368,11 @@
           const cell = document.createElement("div");
           cell.className = "cell";
           if (board[r][c] !== null) {
-            cell.classList.add("color" + board[r][c]);
+            // 目玉焼き画像を配置
+            const img = document.createElement("img");
+            img.src = puyoImgSrc;
+            img.className = "puyo-img color" + board[r][c];
+            cell.appendChild(img);
           }
           boardDiv.appendChild(cell);
         }
@@ -418,9 +385,11 @@
         // 主ぷよ
         if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
           const idx = y * COLS + x;
-          if (boardDiv.children[idx]) {
-            boardDiv.children[idx].classList.add("color" + pair[0]);
-          }
+          const cell = boardDiv.children[idx];
+          const img = document.createElement("img");
+          img.src = puyoImgSrc;
+          img.className = "puyo-img color" + pair[0];
+          cell.appendChild(img);
         }
 
         // ペアぷよ
@@ -428,17 +397,21 @@
           const py = y - 1;
           if (py >= 0 && py < ROWS && x >= 0 && x < COLS) {
             const idx2 = py * COLS + x;
-            if (boardDiv.children[idx2]) {
-              boardDiv.children[idx2].classList.add("color" + pair[1]);
-            }
+            const cell2 = boardDiv.children[idx2];
+            const img2 = document.createElement("img");
+            img2.src = puyoImgSrc;
+            img2.className = "puyo-img color" + pair[1];
+            cell2.appendChild(img2);
           }
         } else {
           const px2 = x + 1;
           if (y >= 0 && y < ROWS && px2 >= 0 && px2 < COLS) {
             const idx2 = y * COLS + px2;
-            if (boardDiv.children[idx2]) {
-              boardDiv.children[idx2].classList.add("color" + pair[1]);
-            }
+            const cell2 = boardDiv.children[idx2];
+            const img2 = document.createElement("img");
+            img2.src = puyoImgSrc;
+            img2.className = "puyo-img color" + pair[1];
+            cell2.appendChild(img2);
           }
         }
       }
@@ -448,7 +421,11 @@
       nextDiv.innerHTML = "";
       next.forEach(color => {
         const div = document.createElement("div");
-        div.className = "cell color" + color;
+        div.className = "cell";
+        const img = document.createElement("img");
+        img.src = puyoImgSrc;
+        img.className = "puyo-img color" + color;
+        div.appendChild(img);
         nextDiv.appendChild(div);
       });
     }
@@ -470,14 +447,12 @@
 
     function canPlaceCurrent(x, y, vertical) {
       if (x < 0 || x >= COLS) return false;
-      if (y < 0) return false;
       if (vertical) {
-        if (y >= ROWS) return false;
-        if (y - 1 < 0) return false;
+        if (y < 1 || y >= ROWS) return false;
         if (board[y][x] !== null) return false;
         if (board[y - 1][x] !== null) return false;
       } else {
-        if (y >= ROWS) return false;
+        if (y < 0 || y >= ROWS) return false;
         if (x + 1 >= COLS) return false;
         if (board[y][x] !== null) return false;
         if (board[y][x + 1] !== null) return false;
@@ -485,271 +460,220 @@
       return true;
     }
 
-    function placeCurrent() {
-      const { x, y, vertical, pair } = current;
-      board[y][x] = pair[0];
+    function moveCurrent(dx, dy) {
+      if (paused || isGameOver) return;
+      const nx = current.x + dx;
+      const ny = current.y + dy;
+      if (canPlaceCurrent(nx, ny, current.vertical)) {
+        current.x = nx;
+        current.y = ny;
+        drawBoard();
+        return true;
+      }
+      return false;
+    }
+
+    function rotateCurrent(clockwise) {
+      if (paused || isGameOver) return;
+      let vertical = current.vertical;
+      vertical = !vertical;
+      // 確認座標を変えて当たり判定
+      let x = current.x;
+      let y = current.y;
+
       if (vertical) {
+        // 横 → 縦
+        // ペアぷよは上に来る
+        if (y < 1) return; // 回転できない場合
+        if (!canPlaceCurrent(x, y, true)) return;
+      } else {
+        // 縦 → 横
+        if (x + 1 >= COLS) return;
+        if (!canPlaceCurrent(x, y, false)) return;
+      }
+      current.vertical = vertical;
+      drawBoard();
+    }
+
+    function fixCurrent() {
+      if (!current) return;
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        board[y][x] = pair[0];
         board[y - 1][x] = pair[1];
       } else {
+        board[y][x] = pair[0];
         board[y][x + 1] = pair[1];
       }
       current = null;
     }
 
-    function isEmpty(x, y) {
-      return y >= 0 && y < ROWS && x >= 0 && x < COLS && board[y][x] === null;
-    }
-
-    // ぷよを1段下げる
-    function fallPuyos() {
-      let moved = false;
-      for (let r = ROWS - 2; r >= 0; r--) {
-        for (let c = 0; c < COLS; c++) {
+    // 下にぷよを落とす
+    function applyGravity() {
+      for (let c = 0; c < COLS; c++) {
+        for (let r = ROWS - 2; r >= 0; r--) {
           if (board[r][c] !== null && board[r + 1][c] === null) {
             board[r + 1][c] = board[r][c];
             board[r][c] = null;
-            moved = true;
           }
         }
       }
-      return moved;
     }
 
-    // ぷよ消し処理（4連結以上を消す）
-    function clearPuyos() {
+    // 連鎖の判定
+    function findChains() {
       const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
-      let toClear = [];
-      function dfs(r, c, color) {
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return [];
-        if (visited[r][c]) return [];
-        if (board[r][c] !== color) return [];
+      const toClear = [];
+      function dfs(r, c, color, group) {
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+        if (visited[r][c]) return;
+        if (board[r][c] !== color) return;
         visited[r][c] = true;
-        let group = [[r, c]];
-        [[1,0],[-1,0],[0,1],[0,-1]].forEach(([dr, dc]) => {
-          group = group.concat(dfs(r+dr, c+dc, color));
-        });
-        return group;
+        group.push([r, c]);
+        dfs(r - 1, c, color, group);
+        dfs(r + 1, c, color, group);
+        dfs(r, c - 1, color, group);
+        dfs(r, c + 1, color, group);
       }
+
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           if (board[r][c] !== null && !visited[r][c]) {
-            const group = dfs(r, c, board[r][c]);
+            const group = [];
+            dfs(r, c, board[r][c], group);
             if (group.length >= 4) {
-              toClear = toClear.concat(group);
+              toClear.push(...group);
             }
           }
         }
       }
-      if (toClear.length === 0) return false;
+      return toClear;
+    }
 
-      // 消す
-      toClear.forEach(([r,c]) => {
+    function clearChains() {
+      const toClear = findChains();
+      if (toClear.length === 0) return false;
+      toClear.forEach(([r, c]) => {
         board[r][c] = null;
       });
-
       score += toClear.length * 10;
       scoreSpan.textContent = score;
       return true;
     }
 
-    // ゲームループ（落下＆消去判定）
-    let dropInterval = null;
     function gameLoop() {
-      if (paused || isGameOver || clearing) return;
+      if (paused || isGameOver) return;
       if (!current) {
+        // 落下中ぷよがない場合は新規生成
         spawn();
-        drawBoard();
-        return;
-      }
-      // 下に空きがあれば落下
-      if (canMoveDown()) {
-        current.y++;
       } else {
-        // 固定して消す判定
-        placeCurrent();
-        drawBoard();
-        clearing = true;
-        setTimeout(() => {
-          if (clearPuyos()) {
-            // 消したら落下して再チェック
-            while(fallPuyos()) {}
-            drawBoard();
-            setTimeout(() => {
-              clearing = false;
-              gameLoop();
-            }, 300);
-          } else {
-            clearing = false;
-            drawBoard();
-          }
-        }, 300);
-        return;
+        // 落下
+        if (!moveCurrent(0, 1)) {
+          fixCurrent();
+          let cleared = false;
+          do {
+            cleared = clearChains();
+            if (cleared) {
+              applyGravity();
+            }
+          } while (cleared);
+          drawBoard();
+          current = null;
+        }
       }
       drawBoard();
     }
 
-    function canMoveDown() {
-      const { x, y, vertical, pair } = current;
-      if (vertical) {
-        if (y + 1 >= ROWS) return false;
-        if (board[y + 1][x] !== null) return false;
-        if (board[y][x] !== null) return false;
-      } else {
-        if (y + 1 >= ROWS) return false;
-        if (board[y + 1][x] !== null) return false;
-        if (board[y + 1][x + 1] !== null) return false;
-      }
-      return true;
-    }
-
-    // 横左右移動
-    function moveLeft() {
-      if (!current) return;
-      const { x, y, vertical, pair } = current;
-      if (vertical) {
-        if (x - 1 < 0) return;
-        if (board[y][x-1] !== null) return;
-        if (board[y -1][x-1] !== null) return;
-        current.x--;
-        drawBoard();
-      } else {
-        if (x - 1 < 0) return;
-        if (board[y][x-1] !== null) return;
-        if (board[y][x] !== null) return;
-        current.x--;
-        drawBoard();
-      }
-    }
-    function moveRight() {
-      if (!current) return;
-      const { x, y, vertical, pair } = current;
-      if (vertical) {
-        if (x + 1 >= COLS) return;
-        if (board[y][x+1] !== null) return;
-        if (board[y - 1][x + 1] !== null) return;
-        current.x++;
-        drawBoard();
-      } else {
-        if (x + 2 >= COLS) return;
-        if (board[y][x + 2] !== null) return;
-        if (board[y][x + 1] !== null) return;
-        current.x++;
-        drawBoard();
-      }
-    }
-
-    // 回転
-    function rotateLeft() {
-      if (!current) return;
-      const { x, y, vertical } = current;
-      if (vertical) {
-        // 縦 → 横
-        if (x + 1 >= COLS) return;
-        if (board[y][x + 1] !== null) return;
-        current.vertical = false;
-      } else {
-        // 横 → 縦
-        if (y - 1 < 0) return;
-        if (board[y - 1][x] !== null) return;
-        current.vertical = true;
-      }
-      drawBoard();
-    }
-    function rotateRight() {
-      // 右回転は左回転の逆操作でOK
-      rotateLeft();
-    }
-
-    // ハードドロップ（上ボタン）
+    // ハードドロップ
     function hardDrop() {
-      if (!current) return;
-      while (true) {
-        const { x, y, vertical } = current;
-        let canGoDown = false;
-        if (vertical) {
-          if (y + 1 < ROWS && board[y + 1][x] === null) {
-            canGoDown = true;
-          }
-        } else {
-          if (y + 1 < ROWS && board[y + 1][x] === null && board[y + 1][x + 1] === null) {
-            canGoDown = true;
-          }
+      if (paused || isGameOver) return;
+      while (moveCurrent(0, 1)) {}
+      fixCurrent();
+      let cleared = false;
+      do {
+        cleared = clearChains();
+        if (cleared) {
+          applyGravity();
         }
-        if (canGoDown) {
-          current.y++;
-        } else {
-          break;
-        }
-      }
+      } while (cleared);
       drawBoard();
+      current = null;
     }
 
-    // 操作ボタンのイベント登録
-    document.getElementById("btnLeft").addEventListener("click", () => { moveLeft(); });
-    document.getElementById("btnRight").addEventListener("click", () => { moveRight(); });
-    document.getElementById("btnDown").addEventListener("click", () => {
-      if (!current) return;
-      current.y++;
-      drawBoard();
-    });
-    document.getElementById("btnRotateLeft").addEventListener("click", () => { rotateLeft(); });
-    document.getElementById("btnRotateRight").addEventListener("click", () => { rotateRight(); });
-    document.getElementById("btnUp").addEventListener("click", () => { hardDrop(); });
-    document.getElementById("pauseBtn").addEventListener("click", () => {
-      paused = !paused;
-      pauseBtn.textContent = paused ? "再開" : "一時停止";
-    });
-    document.getElementById("btnRestart").addEventListener("click", () => {
-      resetGame();
+    // 操作ボタンイベント
+    document.getElementById("btnLeft").onclick = () => moveCurrent(-1, 0);
+    document.getElementById("btnRight").onclick = () => moveCurrent(1, 0);
+    document.getElementById("btnDown").onclick = () => moveCurrent(0, 1);
+    document.getElementById("btnUp").onclick = () => hardDrop();
+    document.getElementById("btnRotateLeft").onclick = () => rotateCurrent(false);
+    document.getElementById("btnRotateRight").onclick = () => rotateCurrent(true);
+
+    // キーボード操作
+    window.addEventListener("keydown", e => {
+      if (paused || isGameOver) return;
+      switch (e.key) {
+        case "ArrowLeft":
+          moveCurrent(-1, 0);
+          break;
+        case "ArrowRight":
+          moveCurrent(1, 0);
+          break;
+        case "ArrowDown":
+          moveCurrent(0, 1);
+          break;
+        case "ArrowUp":
+          hardDrop();
+          break;
+        case "z":
+        case "Z":
+          rotateCurrent(false);
+          break;
+        case "x":
+        case "X":
+          rotateCurrent(true);
+          break;
+        case "p":
+        case "P":
+          togglePause();
+          break;
+      }
     });
 
-    // ゲームリセット
-    function resetGame() {
+    // ゲームオーバーリスタート
+    document.getElementById("btnRestart").onclick = () => {
+      isGameOver = false;
+      score = 0;
+      scoreSpan.textContent = score;
       for (let r = 0; r < ROWS; r++) {
         for (let c = 0; c < COLS; c++) {
           board[r][c] = null;
         }
       }
-      score = 0;
-      scoreSpan.textContent = score;
-      isGameOver = false;
-      clearing = false;
-      paused = false;
       current = null;
       next = [randColor(), randColor()];
       drawNext();
       drawBoard();
       gameOverOverlay.style.display = "none";
+      paused = false;
+      pauseBtn.textContent = "一時停止";
+    };
+
+    // 一時停止トグル
+    function togglePause() {
+      paused = !paused;
+      pauseBtn.textContent = paused ? "再開" : "一時停止";
     }
+    pauseBtn.onclick = togglePause;
 
-    // ゲーム開始
-    resetGame();
-
-    // 自動落下タイマー
+    // ゲームループ間隔設定
     setInterval(() => {
-      if (!paused && !isGameOver && !clearing) {
-        if (current) {
-          if (canMoveDown()) {
-            current.y++;
-            drawBoard();
-          } else {
-            placeCurrent();
-            clearing = true;
-            setTimeout(() => {
-              if (clearPuyos()) {
-                while(fallPuyos()) {}
-                drawBoard();
-              }
-              clearing = false;
-            }, 300);
-          }
-        } else {
-          spawn();
-          drawBoard();
-        }
-      }
-    }, 800);
+      gameLoop();
+    }, 600);
 
+    // 初期化
+    next = [randColor(), randColor()];
+    drawNext();
+    drawBoard();
   </script>
 </body>
 </html>

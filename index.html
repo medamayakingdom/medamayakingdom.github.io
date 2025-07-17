@@ -474,26 +474,41 @@
     }
 
     function rotateCurrent(clockwise) {
-      if (paused || isGameOver) return;
-      let vertical = current.vertical;
-      vertical = !vertical;
-      // 確認座標を変えて当たり判定
-      let x = current.x;
-      let y = current.y;
+  if (paused || isGameOver) return;
+  let vertical = current.vertical;
+  let x = current.x;
+  let y = current.y;
 
-      if (vertical) {
-        // 横 → 縦
-        // ペアぷよは上に来る
-        if (y < 1) return; // 回転できない場合
-        if (!canPlaceCurrent(x, y, true)) return;
-      } else {
-        // 縦 → 横
-        if (x + 1 >= COLS) return;
-        if (!canPlaceCurrent(x, y, false)) return;
-      }
-      current.vertical = vertical;
-      drawBoard();
+  if (clockwise) {
+    // 右回転時の座標調整・判定
+    if (vertical) {
+      // 縦→横に回転
+      if (x + 1 >= COLS) return;
+      if (!canPlaceCurrent(x, y, false)) return;
+      current.x = x; // 必要に応じ調整
+    } else {
+      // 横→縦に回転
+      if (y < 1) return;
+      if (!canPlaceCurrent(x, y, true)) return;
     }
+    current.vertical = !vertical;
+  } else {
+    // 左回転時の座標調整・判定
+    if (vertical) {
+      // 縦→横に回転（左回転は右回転と少し違う場合がある）
+      if (x - 1 < 0) return;
+      if (!canPlaceCurrent(x - 1, y, false)) return;
+      current.x = x - 1;
+    } else {
+      // 横→縦に回転
+      if (y < 1) return;
+      if (!canPlaceCurrent(x, y, true)) return;
+    }
+    current.vertical = !vertical;
+  }
+  drawBoard();
+}
+
 
     function fixCurrent() {
       if (!current) return;

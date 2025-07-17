@@ -33,7 +33,6 @@
       color: #777;
       margin-top: 3em;
     }
-    /* Puyo game */
     #puyoGame {
       display: flex;
       justify-content: center;
@@ -45,6 +44,9 @@
       grid-template-columns: repeat(6, 40px);
       grid-auto-rows: 40px;
       gap: 2px;
+      background-color: #ccc;
+      padding: 4px;
+      border: 3px solid #444;
     }
     #next {
       grid-template-columns: repeat(2, 40px);
@@ -55,11 +57,12 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: center;
+      border: 1px solid #999;
     }
-    .color0 { filter: hue-rotate(0deg); background-image: url('fried_egg.png'); }
-    .color1 { filter: hue-rotate(90deg); background-image: url('fried_egg.png'); }
-    .color2 { filter: hue-rotate(180deg); background-image: url('fried_egg.png'); }
-    .color3 { filter: hue-rotate(270deg); background-image: url('fried_egg.png'); }
+    .color0 { background-image: url('egg_red.png'); }
+    .color1 { background-image: url('egg_yellow.png'); }
+    .color2 { background-image: url('egg_blue.png'); }
+    .color3 { background-image: url('egg_green.png'); }
   </style>
 </head>
 <body>
@@ -98,7 +101,6 @@
   <div class="footer">&copy; 2025 medamayakingdom</div>
 
   <script>
-    // Count Game
     let correctCount = 0;
     function startCountGame() {
       const container = document.getElementById("eggContainer");
@@ -119,12 +121,10 @@
       result.innerText = userAnswer === correctCount ? "🎉 正解。" : `残念。正解は ${correctCount}`;
     }
 
-    // Puyo Logic
     const rows = 12;
     const cols = 6;
     const board = Array.from({ length: rows }, () => Array(cols).fill(null));
     let current, next, score = 0;
-
     const colors = [0, 1, 2, 3];
 
     const boardDiv = document.getElementById("board");
@@ -140,6 +140,13 @@
           if (board[r][c] != null) cell.classList.add("color" + board[r][c]);
           boardDiv.appendChild(cell);
         }
+      }
+      if (current) {
+        const i = (current.y * cols) + current.x;
+        const pairI = ((current.y - 1) * cols) + current.x;
+        const cells = boardDiv.children;
+        if (cells[i]) cells[i].classList.add("color" + current.pair[0]);
+        if (current.y > 0 && cells[pairI]) cells[pairI].classList.add("color" + current.pair[1]);
       }
     }
 
@@ -163,9 +170,7 @@
     }
 
     function tick() {
-      if (!current) {
-        spawn();
-      }
+      if (!current) spawn();
       if (canMove(0, 1)) {
         current.y++;
       } else {
@@ -177,7 +182,8 @@
     }
 
     function canMove(dx, dy) {
-      const x = current.x, y = current.y;
+      const x = current.x;
+      const y = current.y;
       return y + dy < rows && board[y + dy][x] === null;
     }
 
@@ -187,12 +193,10 @@
     }
 
     function clearLines() {
-      // 仮: ライン消去せずスコアだけ増やす
       score += 10;
       scoreSpan.innerText = score;
     }
 
-    // 操作
     document.addEventListener("keydown", e => {
       if (!current) return;
       if (e.key === "ArrowLeft" && current.x > 0) current.x--;
@@ -201,7 +205,6 @@
       drawBoard();
     });
 
-    // 初期化
     next = [randColor(), randColor()];
     drawNext();
     setInterval(tick, 1000);

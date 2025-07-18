@@ -237,31 +237,29 @@
   <div id="accessInfo">アクセス数：読み込み中…</div>
 
   <div id="langSelector">
-  <strong>言語/方言を選択：</strong><br>
-  <button onclick="setLang('ja')">標準語</button>
-  <button onclick="setLang('hokkaido')">北海道弁</button>
-  <button onclick="setLang('tsugaru')">津軽弁</button>
-  <button onclick="setLang('sendai')">仙台弁</button>
-  <button onclick="setLang('ibaraki')">茨城弁</button>
-  <button onclick="setLang('nagoya')">名古屋弁</button>
-  <button onclick="setLang('kyoto')">京都弁</button>
-  <button onclick="setLang('osaka')">大阪弁</button>
-  <button onclick="setLang('kochi')">高知弁</button>
-  <button onclick="setLang('hakata')">博多弁</button>
-  <button onclick="setLang('kumamoto')">熊本弁</button>
-  <button onclick="setLang('kagoshima')">鹿児島弁</button>
-  <button onclick="setLang('okinawa')">沖縄方言</button>
-  <button onclick="setLang('en')">English</button>
-  <button onclick="setLang('zh')">中文</button>
-  <button onclick="setLang('ko')">한국어</button>
-  <button onclick="setLang('de')">Deutsch</button>
-  <button onclick="setLang('fr')">Français</button>
-  <button onclick="setLang('es')">Español</button>
-  <button onclick="setLang('ru')">Русский</button>
-  <button onclick="setLang('ar')">العربية</button>
-  <button onclick="setLang('pt')">Português</button>
-  <button onclick="setLang('hi')">हिंदी</button>
-  <button onclick="setLang('id')">Bahasa Indonesia</button>
+  <label for="langSelect"><strong>言語/方言を選択：</strong></label>
+    <select id="langSelect">
+      <option value="ja-hkd">北海道弁</option>
+      <option value="ja-tsg">津軽弁</option>
+      <option value="ja-sdj">仙台弁</option>
+      <option value="ja-ibr">茨城弁</option>
+      <option value="ja-nag">名古屋弁</option>
+      <option value="ja-kyoto">京都弁</option>
+      <option value="ja-osaka">大阪弁</option>
+      <option value="ja-kochi">高知弁</option>
+      <option value="ja-hakata">博多弁</option>
+      <option value="ja-kumamoto">熊本弁</option>
+      <option value="ja-kagoshima">鹿児島弁</option>
+      <option value="ja-okinawa">沖縄方言</option>
+      <option value="en">英語</option>
+      <option value="zh">中国語</option>
+      <option value="ko">韓国語</option>
+      <option value="de">ドイツ語</option>
+      <option value="fr">フランス語</option>
+      <option value="es">スペイン語</option>
+      <option value="ru">ロシア語</option>
+    </select>
+    <button onclick="selectLang()">決定</button>
 </div>
 
   <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
@@ -736,10 +734,10 @@
     drawNext();
     drawBoard();
 
-    function setLang(lang) {
-  alert("選択された言語コード: " + lang + "\n※翻訳機能は未実装です");
-}
-
+    function selectLang() {
+      const selected = document.getElementById("langSelect").value;
+      alert("選択された言語コード: " + selected + "\n※翻訳機能はまだ実装されていません");
+    }
     
   </script>
 </body>

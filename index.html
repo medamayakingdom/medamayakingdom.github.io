@@ -1,694 +1,1024 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <title>おいしい目玉焼きの作り方 - v1.5</title>
-  <style>
-    body {
-      font-family: sans-serif;
-      background-color: #fffbea;
-      color: #333;
-      padding: 2em;
-      line-height: 1.8;
-      text-align: center;
-      user-select: none;
-    }
-    h1 {
-      color: #e67e22;
-      margin-bottom: 0.2em;
-    }
+  <meta charset="UTF-8" />
+  <title>おいしい目玉焼きの作り方 - v1.5</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #fffbea;
+      color: #333;
+      padding: 2em;
+      line-height: 1.8;
+      text-align: center;
+      user-select: none;
+    }
+    h1 {
+      color: #e67e22;
+      margin-bottom: 0.2em;
+    }
 
-    /* アクセス数表示 */
-    #accessInfo {
-      font-size: 0.9em;
-      color: #666;
-      margin-bottom: 1em;
-    }
+    /* アクセス数表示 */
+    #accessInfo {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 1em;
+    }
 
-    .egg-img {
-      display: block;
-      margin: 20px auto;
-      width: 200px;
-    }
-    .section {
-      margin-bottom: 2em;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-    }
-    .footer {
-      text-align: center;
-      font-size: 0.9em;
-      color: #777;
-      margin-top: 3em;
-    }
-    /* Puyo game */
-    #puyoGame {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-    #board, #next {
-      display: grid;
-      grid-template-columns: repeat(6, 40px);
-      grid-auto-rows: 40px;
-      gap: 2px;
-      border: 2px solid #e67e22;
-      border-radius: 8px;
-      background: #fffbea;
-      box-shadow: 0 0 8px rgba(230, 126, 34, 0.3);
-      position: relative;
-    }
-    #next {
-      grid-template-columns: repeat(2, 40px);
-      width: fit-content;
-      padding: 6px;
-    }
-    .cell {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      border-radius: 6px;
-      transition: opacity 0.3s ease;
-      background: white; /* 空白セルは白背景 */
-      position: relative;
-    }
-    /* 色指定は使わず画像で目玉焼き表示 */
+    .egg-img {
+      display: block;
+      margin: 20px auto;
+      width: 200px;
+    }
+    .section {
+      margin-bottom: 2em;
+      text-align: left;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #777;
+      margin-top: 3em;
+    }
+    /* Puyo game */
+    #puyoGame {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      margin-top: 30px;
+      flex-wrap: wrap;
+    }
+    #board, #next {
+      display: grid;
+      grid-template-columns: repeat(6, 40px);
+      grid-auto-rows: 40px;
+      gap: 2px;
+      border: 2px solid #e67e22;
+      border-radius: 8px;
+      background: #fffbea;
+      box-shadow: 0 0 8px rgba(230, 126, 34, 0.3);
+      position: relative;
+    }
+    #next {
+      grid-template-columns: repeat(2, 40px);
+      width: fit-content;
+      padding: 6px;
+    }
+    .cell {
+      width: 40px;
+      height: 40px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      border-radius: 6px;
+      transition: opacity 0.3s ease;
+      background: white; /* 空白セルは白背景 */
+      position: relative;
+    }
+    /* 色指定は使わず画像で目玉焼き表示 */
 
-    /* チカチカ用アニメーション */
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-    .blink {
-      animation: blink 0.6s ease-in-out 3;
-    }
+    /* チカチカ用アニメーション */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+    .blink {
+      animation: blink 0.6s ease-in-out 3;
+    }
 
-    /* 操作ボタン配置 */
-    #controls {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      user-select: none;
-    }
-    #buttonGrid {
-      display: grid;
-      grid-template-columns: 40px 40px 40px;
-      grid-template-rows: 40px 40px 40px;
-      gap: 8px;
-      user-select: none;
-    }
-    #buttonGrid button {
-      background-color: #e67e22;
-      border: none;
-      color: white;
-      font-size: 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      width: 40px;
-      height: 40px;
-      font-weight: bold;
-    }
-    #buttonGrid button:hover {
-      background-color: #d35400;
-    }
-    #buttonGrid .empty {
-      background: transparent;
-      box-shadow: none;
-      cursor: default;
-      pointer-events: none;
-    }
-    /* 回転ボタンの丸ボタン */
-    #btnRotateLeft, #btnRotateRight {
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      font-size: 0;
-    }
-    /* SVGの色 */
-    svg {
-      fill: white;
-      width: 24px;
-      height: 24px;
-      user-select: none;
-    }
+    /* 操作ボタン配置 */
+    #controls {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      user-select: none;
+    }
+    #buttonGrid {
+      display: grid;
+      grid-template-columns: 40px 40px 40px;
+      grid-template-rows: 40px 40px 40px;
+      gap: 8px;
+      user-select: none;
+    }
+    #buttonGrid button {
+      background-color: #e67e22;
+      border: none;
+      color: white;
+      font-size: 24px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+      user-select: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      line-height: 1;
+      width: 40px;
+      height: 40px;
+      font-weight: bold;
+    }
+    #buttonGrid button:hover {
+      background-color: #d35400;
+    }
+    #buttonGrid .empty {
+      background: transparent;
+      box-shadow: none;
+      cursor: default;
+      pointer-events: none;
+    }
+    /* 回転ボタンの丸ボタン */
+    #btnRotateLeft, #btnRotateRight {
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      font-size: 0;
+    }
+    /* SVGの色 */
+    svg {
+      fill: white;
+      width: 24px;
+      height: 24px;
+      user-select: none;
+    }
 
-    /* ゲームオーバー表示 */
-    #gameOverOverlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 2em;
-      z-index: 9999;
-      flex-direction: column;
-      user-select: none;
-    }
-    #gameOverOverlay button {
-      margin-top: 20px;
-      font-size: 1em;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background-color: #e67e22;
-      color: white;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s ease;
-    }
-    #gameOverOverlay button:hover {
-      background-color: #d35400;
-    }
+    /* ゲームオーバー表示 */
+    #gameOverOverlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 2em;
+      z-index: 9999;
+      flex-direction: column;
+      user-select: none;
+    }
+    #gameOverOverlay button {
+      margin-top: 20px;
+      font-size: 1em;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #e67e22;
+      color: white;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #gameOverOverlay button:hover {
+      background-color: #d35400;
+    }
 
-    /* 一時停止ボタン */
-    #pauseBtn {
-      margin-top: 12px;
-      background-color: #2980b9;
-      border: none;
-      color: white;
-      font-size: 1em;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #pauseBtn:hover {
-      background-color: #1f6391;
-    }
+    /* 一時停止ボタン */
+    #pauseBtn {
+      margin-top: 12px;
+      background-color: #2980b9;
+      border: none;
+      color: white;
+      font-size: 1em;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+    #pauseBtn:hover {
+      background-color: #1f6391;
+    }
 
-    /* ぷよ画像（目玉焼き）をセルに絶対配置 */
-    .puyo-img {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 36px;
-      height: 36px;
-      pointer-events: none;
-      user-select: none;
-      filter: hue-rotate(0deg);
-      transition: filter 0.3s ease;
-    }
-    /* 色ごとのフィルター */
-    .color0 { filter: hue-rotate(0deg); }    /* 赤 */
-    .color1 { filter: hue-rotate(210deg); }  /* 青 */
-    .color2 { filter: hue-rotate(90deg); }   /* 緑 */
-    .color3 { filter: hue-rotate(50deg); }   /* 黄 */
-  </style>
+    /* ぷよ画像（目玉焼き）をセルに絶対配置 */
+    .puyo-img {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 36px;
+      height: 36px;
+      pointer-events: none;
+      user-select: none;
+      filter: hue-rotate(0deg);
+      transition: filter 0.3s ease;
+    }
+    /* 色ごとのフィルター */
+    .color0 { filter: hue-rotate(0deg); }    /* 赤 */
+    .color1 { filter: hue-rotate(210deg); }  /* 青 */
+    .color2 { filter: hue-rotate(90deg); }   /* 緑 */
+    .color3 { filter: hue-rotate(50deg); }   /* 黄 */
+  </style>
 </head>
 <body>
-  <div id="accessInfo">アクセス数：読み込み中…</div>
+  <div id="accessInfo">アクセス数：読み込み中…</div>
 
-  <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
-  <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
+  <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
+  <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
 
-  <div class="section">
-    <h2>材料（1人分）</h2>
-    <ul>
-      <li>卵 … 1個</li>
-      <li>油 … 小さじ1（サラダ油でもごま油でもOK）</li>
-      <li>塩 … ひとつまみ</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <h2>作り方</h2>
-    <ol>
-      <li>フライパンを中火で温め、油を入れます。</li>
-      <li>油が熱くなったら、卵をそっと割り入れます。</li>
-      <li>白身が固まりはじめたら、弱火にしてフタをします。</li>
-      <li>黄身の表面がうっすら白くなったら火を止めます。</li>
-      <li>お好みで塩をふって、できあがり！</li>
-      <li>仕上げに塩コショウ、しょうゆ、マヨネーズをトッピングしてもおいしいです。</li>
-    </ol>
-  </div>
-
-  <div class="section">
-    <h2>ワンポイントアドバイス</h2>
-    <p>
-      水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br />
-      フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめ。
-    </p>
-  </div>
-
-  <hr />
-
-  <h2>🥚 目玉焼きを数えるゲーム</h2>
-  <button onclick="startCountGame()">スタート</button>
-  <div id="eggContainer" style="margin-top: 20px;"></div>
-  <input type="number" id="answer" />
-  <button onclick="checkCountAnswer()">答える</button>
-  <p id="result"></p>
-
-  <hr />
-
-  <div class="section">
-    <h2>🥚 目玉焼きぷよぷよ</h2>
-    <p>画面のボタンで操作。スコア表示とNEXT表示付き</p>
-    <div id="puyoGame">
-      <div>
-        <div id="board"></div>
-        <div id="scoreArea" style="margin-top:8px; font-weight:bold;">スコア: <span id="score">0</span></div>
-        <button id="pauseBtn">一時停止</button>
-      </div>
-      <div>
-        <p>NEXT</p>
-        <div id="next"></div>
-      </div>
+    <div style="margin-bottom: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;">
+        <button onclick="setLanguage('ja')" style="padding: 8px 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">日本語</button>
+        <button onclick="setLanguage('ja-hokkaido')" style="padding: 8px 15px; background-color: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer;">北海道弁</button>
+        <button onclick="setLanguage('ja-tsugaru')" style="padding: 8px 15px; background-color: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer;">津軽弁</button>
+        <button onclick="setLanguage('ja-sendai')" style="padding: 8px 15px; background-color: #6f42c1; color: white; border: none; border-radius: 5px; cursor: pointer;">仙台弁</button>
+        <button onclick="setLanguage('ja-ibaraki')" style="padding: 8px 15px; background-color: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer;">茨城弁</button>
+        <button onclick="setLanguage('ja-nagoya')" style="padding: 8px 15px; background-color: #17a2b8; color: white; border: none; border-radius: 5px; cursor: pointer;">名古屋弁</button>
+        <button onclick="setLanguage('ja-kyoto')" style="padding: 8px 15px; background-color: #fd7e14; color: white; border: none; border-radius: 5px; cursor: pointer;">京都弁</button>
+        <button onclick="setLanguage('ja-osaka')" style="padding: 8px 15px; background-color: #fd7e14; color: white; border: none; border-radius: 5px; cursor: pointer;">大阪弁</button>
+        <button onclick="setLanguage('ja-kochi')" style="padding: 8px 15px; background-color: #6c757d; color: white; border: none; border-radius: 5px; cursor: pointer;">高知弁</button>
+        <button onclick="setLanguage('ja-hakata')" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">博多弁</button>
+        <button onclick="setLanguage('ja-kumamoto')" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">熊本弁</button>
+        <button onclick="setLanguage('ja-kagoshima')" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">鹿児島弁</button>
+        <button onclick="setLanguage('ja-okinawa')" style="padding: 8px 15px; background-color: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">沖縄方言</button>
+        
+        <button onclick="setLanguage('en')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">English</button>
+        <button onclick="setLanguage('zh')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">中文</button>
+        <button onclick="setLanguage('ko')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">한국어</button>
+        <button onclick="setLanguage('de')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Deutsch</button>
+        <button onclick="setLanguage('fr')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Français</button>
+        <button onclick="setLanguage('es')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Español</button>
+        <button onclick="setLanguage('ru')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Русский</button>
+        <button onclick="setLanguage('ar')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">العربية</button>
+        <button onclick="setLanguage('pt')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Português</button>
+        <button onclick="setLanguage('hi')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">हिन्दी</button>
+        <button onclick="setLanguage('id')" style="padding: 8px 15px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">Bahasa Indonesia</button>
     </div>
-    <div id="controls">
-      <div id="buttonGrid">
-        <button id="btnRotateLeft" title="左回転 ⟲">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
-            <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
-          </svg>
-        </button>
-        <button id="btnUp" title="ハードドロップ ↑">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
-          </svg>
-        </button>
-        <button id="btnRotateRight" title="右回転 ⟳">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
-            <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
-          </svg>
-        </button>
-        <button id="btnLeft" title="左 ←">←</button>
-        <button class="empty" aria-hidden="true" tabindex="-1"></button>
-        <button id="btnRight" title="右 →">→</button>
-        <button id="btnDown" title="下 ↓">↓</button>
-      </div>
-    </div>
-  </div>
 
-  <div id="gameOverOverlay" role="alert" aria-live="assertive">
-    <div>ゲームオーバー！</div>
-    <button id="btnRestart">リスタート</button>
-  </div>
+  <div class="section">
+    <h2>材料（1人分）</h2>
+    <ul>
+      <li>卵 … 1個</li>
+      <li>油 … 小さじ1（サラダ油でもごま油でもOK）</li>
+      <li>塩 … ひとつまみ</li>
+    </ul>
+  </div>
 
-  <div class="footer">&copy; 2025 medamayakingdom</div>
+  <div class="section">
+    <h2>作り方</h2>
+    <ol>
+      <li>フライパンを中火で温め、油を入れます。</li>
+      <li>油が熱くなったら、卵をそっと割り入れます。</li>
+      <li>白身が固まりはじめたら、弱火にしてフタをします。</li>
+      <li>黄身の表面がうっすら白くなったら火を止めます。</li>
+      <li>お好みで塩をふって、できあがり！</li>
+      <li>仕上げに塩コショウ、しょうゆ、マヨネーズをトッピングしてもおいしいです。</li>
+    </ol>
+  </div>
 
-  <script>
-    // アクセス数をブラウザ単位でカウントして表示（簡易版）
-    function updateAccessCount() {
-      let count = localStorage.getItem('my_access_count');
-      count = count ? parseInt(count) : 0;
-      count++;
-      localStorage.setItem('my_access_count', count);
-      document.getElementById('accessInfo').textContent = `あなたのこのブラウザでのアクセス数：${count}`;
-    }
-    updateAccessCount();
+  <div class="section">
+    <h2>ワンポイントアドバイス</h2>
+    <p>
+      水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br />
+      フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめ。
+    </p>
+  </div>
 
-    // Count Game
-    let correctCount = 0;
-    function startCountGame() {
-      const container = document.getElementById("eggContainer");
-      container.innerHTML = "";
-      correctCount = Math.floor(Math.random() * 6) + 5;
-      for (let i = 0; i < correctCount; i++) {
-        const img = document.createElement("img");
-        img.src = "fried_egg.png";
-        img.style.width = "60px";
-        img.style.margin = "5px";
-        container.appendChild(img);
-      }
-      document.getElementById("result").innerText = "";
-      document.getElementById("answer").value = "";
-    }
-    function checkCountAnswer() {
-      const userAnswer = parseInt(document.getElementById("answer").value);
-      const result = document.getElementById("result");
-      result.innerText = userAnswer === correctCount ? "🎉 正解！" : `😢 残念！正解は ${correctCount} です。`;
-    }
+  <hr />
 
-    // Puyo Puyo Game
-    const ROWS = 12;
-    const COLS = 6;
-    const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-    const colors = [0, 1, 2, 3];
-    let current = null;
-    let next = [];
-    let score = 0;
-    let isGameOver = false;
-    let clearing = false;
-    let paused = false;
+  <h2>🥚 目玉焼きを数えるゲーム</h2>
+  <button onclick="startCountGame()">スタート</button>
+  <div id="eggContainer" style="margin-top: 20px;"></div>
+  <input type="number" id="answer" />
+  <button onclick="checkCountAnswer()">答える</button>
+  <p id="result"></p>
 
-    const boardDiv = document.getElementById("board");
-    const nextDiv = document.getElementById("next");
-    const scoreSpan = document.getElementById("score");
-    const gameOverOverlay = document.getElementById("gameOverOverlay");
-    const pauseBtn = document.getElementById("pauseBtn");
+  <hr />
 
-    // ぷよの目玉焼き画像URL
-    const puyoImgSrc = "fried_egg.png";
+  <div class="section">
+    <h2>🥚 目玉焼きぷよぷよ</h2>
+    <p>画面のボタンで操作。スコア表示とNEXT表示付き</p>
+    <div id="puyoGame">
+      <div>
+        <div id="board"></div>
+        <div id="scoreArea" style="margin-top:8px; font-weight:bold;">スコア: <span id="score">0</span></div>
+        <button id="pauseBtn">一時停止</button>
+      </div>
+      <div>
+        <p>NEXT</p>
+        <div id="next"></div>
+      </div>
+    </div>
+    <div id="controls">
+      <div id="buttonGrid">
+        <button id="btnRotateLeft" title="左回転 ⟲">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
+            <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
+          </svg>
+        </button>
+        <button id="btnUp" title="ハードドロップ ↑">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
+          </svg>
+        </button>
+        <button id="btnRotateRight" title="右回転 ⟳">
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
+            <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
+          </svg>
+        </button>
+        <button id="btnLeft" title="左 ←">←</button>
+        <button class="empty" aria-hidden="true" tabindex="-1"></button>
+        <button id="btnRight" title="右 →">→</button>
+        <button id="btnDown" title="下 ↓">↓</button>
+      </div>
+    </div>
+  </div>
 
-    function drawBoard() {
-      boardDiv.innerHTML = "";
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          if (board[r][c] !== null) {
-            // 目玉焼き画像を配置
-            const img = document.createElement("img");
-            img.src = puyoImgSrc;
-            img.className = "puyo-img color" + board[r][c];
-            cell.appendChild(img);
-          }
-          boardDiv.appendChild(cell);
+  <div id="gameOverOverlay" role="alert" aria-live="assertive">
+    <div>ゲームオーバー！</div>
+    <button id="btnRestart">リスタート</button>
+  </div>
+
+  <div class="footer">&copy; 2025 medamayakingdom</div>
+
+  <script>
+    // 多言語対応レシピデータ
+    const recipes = {
+        "ja": {
+            "title": "おいしい目玉焼きの作り方",
+            "accessInfoPrefix": "あなたのこのブラウザでのアクセス数：",
+            "ingredientsTitle": "材料（1人分）",
+            "instructionsTitle": "作り方",
+            "adviceTitle": "ワンポイントアドバイス",
+            "footerText": "&copy; 2025 medamayakingdom"
+        },
+        "en": {
+            "title": "How to Make a Delicious Fried Egg",
+            "accessInfoPrefix": "Your access count on this browser: ",
+            "ingredientsTitle": "Ingredients (1 serving)",
+            "instructionsTitle": "Instructions",
+            "adviceTitle": "Tip",
+            "footerText": "&copy; 2025 friedeggkingdom"
+        },
+        "zh": {
+            "title": "美味煎蛋的做法",
+            "accessInfoPrefix": "您在此浏览器的访问次数：",
+            "ingredientsTitle": "材料（1人份）",
+            "instructionsTitle": "做法",
+            "adviceTitle": "小贴士",
+            "footerText": "&copy; 2025 煎蛋王国"
+        },
+        "ko": {
+            "title": "맛있는 계란후라이 만드는 법",
+            "accessInfoPrefix": "이 브라우저에서 귀하의 접근 횟수: ",
+            "ingredientsTitle": "재료 (1인분)",
+            "instructionsTitle": "만드는 법",
+            "adviceTitle": "팁",
+            "footerText": "&copy; 2025 계란후라이 왕국"
+        },
+        // 日本の方言（北→南）
+        "ja-hokkaido": {
+            "title": "うまい目玉焼きの作り方だべさ",
+            "accessInfoPrefix": "あんたのこのブラウザからのアクセス数だべさ：",
+            "ingredientsTitle": "材料（ひとりぶん）",
+            "instructionsTitle": "作り方だべさ",
+            "adviceTitle": "ちょびっとしたコツだべさ",
+            "footerText": "&copy; 2025 目玉焼き王国だべさ"
+        },
+        "ja-tsugaru": {
+            "title": "めぇー目玉焼きの作り方だば",
+            "accessInfoPrefix": "あんたのこのブラウザからのアクセス数だば：",
+            "ingredientsTitle": "材料（ひとりぶん）",
+            "instructionsTitle": "作り方だば",
+            "adviceTitle": "ちょびっとしたコツだば",
+            "footerText": "&copy; 2025 たまごっこ王国だば"
+        },
+        "ja-sendai": {
+            "title": "うめぇ目玉焼きの作り方だっちゃ",
+            "accessInfoPrefix": "おらほのブラウザでのアクセス数だっちゃ：",
+            "ingredientsTitle": "材料（ひとりぶん）",
+            "instructionsTitle": "作り方だっちゃ",
+            "adviceTitle": "ちょっとしたアドバイスだっちゃ",
+            "footerText": "&copy; 2025 目玉焼き王国だっちゃ"
+        },
+        "ja-ibaraki": {
+            "title": "うめぇ目玉焼きの作り方だっぺ",
+            "accessInfoPrefix": "おめぇのブラウザでのアクセス数だっぺ：",
+            "ingredientsTitle": "材料（一人前）",
+            "instructionsTitle": "作り方だっぺ",
+            "adviceTitle": "ワンポイントアドバイスだっぺ",
+            "footerText": "&copy; 2025 目玉焼き王国だっぺ"
+        },
+        "ja-nagoya": {
+            "title": "うみゃー目玉焼きの作り方だがね",
+            "accessInfoPrefix": "あんたのこのブラウザでのアクセス数だがね：",
+            "ingredientsTitle": "材料（1人分）",
+            "instructionsTitle": "作り方だがね",
+            "adviceTitle": "ちょこっとアドバイスだがね",
+            "footerText": "&copy; 2025 目玉焼き王国だがね"
+        },
+        "ja-kyoto": {
+            "title": "おおいしい目玉焼きの作り方どすえ",
+            "accessInfoPrefix": "おこしやす、このブラウザでのアクセス数どす：",
+            "ingredientsTitle": "材料（お一人様分）",
+            "instructionsTitle": "お作り方どす",
+            "adviceTitle": "ちょっとしたお知恵どすえ",
+            "footerText": "&copy; 2025 目玉焼き王国どす"
+        },
+        "ja-osaka": { // 大阪弁を追加
+            "title": "めっちゃ美味しい目玉焼きの作り方やで！",
+            "accessInfoPrefix": "あんたのこのブラウザでのアクセス数やで：",
+            "ingredientsTitle": "材料（一人前）",
+            "instructionsTitle": "作り方やで",
+            "adviceTitle": "ワンポイントアドバイスやで",
+            "footerText": "&copy; 2025 目玉焼き王国やで"
+        },
+        "ja-kochi": {
+            "title": "うまい目玉焼きの作り方ぜよ",
+            "accessInfoPrefix": "おまんのこのブラウザでのアクセス数じゃき：",
+            "ingredientsTitle": "材料（一人分）",
+            "instructionsTitle": "作り方ぜよ",
+            "adviceTitle": "ちょっとしたコツじゃき",
+            "footerText": "&copy; 2025 目玉焼き王国ぜよ"
+        },
+        "ja-hakata": { // 博多弁を追加
+            "title": "うまか目玉焼きの作り方ばい",
+            "accessInfoPrefix": "あんたのこのブラウザでのアクセス数ばい：",
+            "ingredientsTitle": "材料（1人分）",
+            "instructionsTitle": "作り方ばい",
+            "adviceTitle": "ワンポイントアドバイスたい",
+            "footerText": "&copy; 2025 目玉焼き王国ばい"
+        },
+        "ja-kumamoto": {
+            "title": "うまか目玉焼きの作り方ばい",
+            "accessInfoPrefix": "あんたのこのブラウザでのアクセス数ばい：",
+            "ingredientsTitle": "材料（1人分）",
+            "instructionsTitle": "作り方ばい",
+            "adviceTitle": "ワンポイントアドバイスたい",
+            "footerText": "&copy; 2025 目玉焼き王国ばい"
+        },
+        "ja-kagoshima": {
+            "title": "うんまか目玉焼きの作り方じゃっど",
+            "accessInfoPrefix": "おはんのこのブラウザでのアクセス数じゃっど：",
+            "ingredientsTitle": "材料（一人分）",
+            "instructionsTitle": "作り方じゃっど",
+            "adviceTitle": "ちょっとしたこつじゃっど",
+            "footerText": "&copy; 2025 目玉焼き王国じゃっど"
+        },
+        "ja-okinawa": {
+            "title": "まーさん目玉焼きぬ作り方やいびーん",
+            "accessInfoPrefix": "あんたぬこのブラウザからぬアクセス数やいびーん：",
+            "ingredientsTitle": "材料（一人分）",
+            "instructionsTitle": "作り方やいびーん",
+            "adviceTitle": "ちゅくいアドバイスやいびーん",
+            "footerText": "&copy; 2025 目玉焼き王国やいびーん"
+        },
+        // 多言語
+        "de": {
+            "title": "Wie man ein leckeres Spiegelei zubereitet",
+            "accessInfoPrefix": "Ihre Zugriffszahl in diesem Browser: ",
+            "ingredientsTitle": "Zutaten (1 Portion)",
+            "instructionsTitle": "Zubereitung",
+            "adviceTitle": "Tipp",
+            "footerText": "&copy; 2025 Spiegelei-Königreich"
+        },
+        "fr": {
+            "title": "Comment faire un délicieux œuf au plat",
+            "accessInfoPrefix": "Nombre d'accès sur ce navigateur : ",
+            "ingredientsTitle": "Ingrédients (1 portion)",
+            "instructionsTitle": "Préparation",
+            "adviceTitle": "Astuce",
+            "footerText": "&copy; 2025 Royaume de l'œuf au plat"
+        },
+        "es": {
+            "title": "Cómo hacer un delicioso huevo frito",
+            "accessInfoPrefix": "Su número de accesos en este navegador: ",
+            "ingredientsTitle": "Ingredientes (1 porción)",
+            "instructionsTitle": "Instrucciones",
+            "adviceTitle": "Consejo",
+            "footerText": "&copy; 2025 Reino del Huevo Frito"
+        },
+        "ru": {
+            "title": "Как приготовить вкусную яичницу",
+            "accessInfoPrefix": "Количество ваших посещений в этом браузере: ",
+            "ingredientsTitle": "Ингредиенты (1 порция)",
+            "instructionsTitle": "Приготовление",
+            "adviceTitle": "Совет",
+            "footerText": "&copy; 2025 Королевство Яичницы"
+        },
+        "ar": {
+            "title": "كيفية تحضير بيضة مقلية لذيذة",
+            "accessInfoPrefix": "عدد زياراتك على هذا المتصفح: ",
+            "ingredientsTitle": "المكونات (وجبة واحدة)",
+            "instructionsTitle": "طريقة التحضير",
+            "adviceTitle": "نصيحة",
+            "footerText": "&copy; 2025 مملكة البيض المقلي"
+        },
+        "pt": {
+            "title": "Como fazer um ovo frito delicioso",
+            "accessInfoPrefix": "Sua contagem de acessos neste navegador: ",
+            "ingredientsTitle": "Ingredientes (1 porção)",
+            "instructionsTitle": "Instruções",
+            "adviceTitle": "Dica",
+            "footerText": "&copy; 2025 Reino do Ovo Frito"
+        },
+        "hi": {
+            "title": "स्वादिष्ट अंडे का आमलेट कैसे बनाएं",
+            "accessInfoPrefix": "इस ब्राउज़र पर आपकी पहुंच गणना: ",
+            "ingredientsTitle": "सामग्री (1 व्यक्ति के लिए)",
+            "instructionsTitle": "बनाने का तरीका",
+            "adviceTitle": "सुझाव",
+            "footerText": "&copy; 2025 आमलेट साम्राज्य"
+        },
+        "id": { // インドネシア語を追加
+            "title": "Cara Membuat Telur Mata Sapi Lezat",
+            "accessInfoPrefix": "Jumlah akses Anda di browser ini: ",
+            "ingredientsTitle": "Bahan-bahan (1 porsi)",
+            "instructionsTitle": "Cara Memasak",
+            "adviceTitle": "Tips",
+            "footerText": "&copy; 2025 Kerajaan Telur Mata Sapi"
         }
-      }
-
-      // 落下中のぷよ描画
-      if (current) {
-        const { x, y, vertical, pair } = current;
-
-        // 主ぷよ
-        if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-          const idx = y * COLS + x;
-          const cell = boardDiv.children[idx];
-          const img = document.createElement("img");
-          img.src = puyoImgSrc;
-          img.className = "puyo-img color" + pair[0];
-          cell.appendChild(img);
-        }
-
-        // ペアぷよ
-        if (vertical) {
-          const py = y - 1;
-          if (py >= 0 && py < ROWS && x >= 0 && x < COLS) {
-            const idx2 = py * COLS + x;
-            const cell2 = boardDiv.children[idx2];
-            const img2 = document.createElement("img");
-            img2.src = puyoImgSrc;
-            img2.className = "puyo-img color" + pair[1];
-            cell2.appendChild(img2);
-          }
-        } else {
-          const px2 = x + 1;
-          if (y >= 0 && y < ROWS && px2 >= 0 && px2 < COLS) {
-            const idx2 = y * COLS + px2;
-            const cell2 = boardDiv.children[idx2];
-            const img2 = document.createElement("img");
-            img2.src = puyoImgSrc;
-            img2.className = "puyo-img color" + pair[1];
-            cell2.appendChild(img2);
-          }
-        }
-      }
-    }
-
-    function drawNext() {
-      nextDiv.innerHTML = "";
-      next.forEach(color => {
-        const div = document.createElement("div");
-        div.className = "cell";
-        const img = document.createElement("img");
-        img.src = puyoImgSrc;
-        img.className = "puyo-img color" + color;
-        div.appendChild(img);
-        nextDiv.appendChild(div);
-      });
-    }
-
-    function randColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    function spawn() {
-      current = { x: 2, y: 1, vertical: true, pair: [...next] };
-      next = [randColor(), randColor()];
-      drawNext();
-
-      if (!canPlaceCurrent(current.x, current.y, current.vertical)) {
-        isGameOver = true;
-        gameOverOverlay.style.display = "flex";
-      }
-    }
-
-    function canPlaceCurrent(x, y, vertical) {
-      if (x < 0 || x >= COLS) return false;
-      if (vertical) {
-        if (y < 1 || y >= ROWS) return false;
-        if (board[y][x] !== null) return false;
-        if (board[y - 1][x] !== null) return false;
-      } else {
-        if (y < 0 || y >= ROWS) return false;
-        if (x + 1 >= COLS) return false;
-        if (board[y][x] !== null) return false;
-        if (board[y][x + 1] !== null) return false;
-      }
-      return true;
-    }
-
-    function moveCurrent(dx, dy) {
-      if (paused || isGameOver) return;
-      const nx = current.x + dx;
-      const ny = current.y + dy;
-      if (canPlaceCurrent(nx, ny, current.vertical)) {
-        current.x = nx;
-        current.y = ny;
-        drawBoard();
-        return true;
-      }
-      return false;
-    }
-
-    function rotateCurrent(clockwise) {
-  if (paused || isGameOver) return;
-  let vertical = current.vertical;
-  let x = current.x;
-  let y = current.y;
-
-  if (clockwise) {
-    // 右回転時の座標調整・判定
-    if (vertical) {
-      // 縦→横に回転
-      if (x + 1 >= COLS) return;
-      if (!canPlaceCurrent(x, y, false)) return;
-      current.x = x; // 必要に応じ調整
-    } else {
-      // 横→縦に回転
-      if (y < 1) return;
-      if (!canPlaceCurrent(x, y, true)) return;
-    }
-    current.vertical = !vertical;
-  } else {
-    // 左回転時の座標調整・判定
-    if (vertical) {
-      // 縦→横に回転（左回転は右回転と少し違う場合がある）
-      if (x - 1 < 0) return;
-      if (!canPlaceCurrent(x - 1, y, false)) return;
-      current.x = x - 1;
-    } else {
-      // 横→縦に回転
-      if (y < 1) return;
-      if (!canPlaceCurrent(x, y, true)) return;
-    }
-    current.vertical = !vertical;
-  }
-  drawBoard();
-}
-
-
-    function fixCurrent() {
-      if (!current) return;
-      const { x, y, vertical, pair } = current;
-      if (vertical) {
-        board[y][x] = pair[0];
-        board[y - 1][x] = pair[1];
-      } else {
-        board[y][x] = pair[0];
-        board[y][x + 1] = pair[1];
-      }
-      current = null;
-    }
-
-    // 下にぷよを落とす
-    function applyGravity() {
-      for (let c = 0; c < COLS; c++) {
-        for (let r = ROWS - 2; r >= 0; r--) {
-          if (board[r][c] !== null && board[r + 1][c] === null) {
-            board[r + 1][c] = board[r][c];
-            board[r][c] = null;
-          }
-        }
-      }
-    }
-
-    // 連鎖の判定
-    function findChains() {
-      const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
-      const toClear = [];
-      function dfs(r, c, color, group) {
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
-        if (visited[r][c]) return;
-        if (board[r][c] !== color) return;
-        visited[r][c] = true;
-        group.push([r, c]);
-        dfs(r - 1, c, color, group);
-        dfs(r + 1, c, color, group);
-        dfs(r, c - 1, color, group);
-        dfs(r, c + 1, color, group);
-      }
-
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          if (board[r][c] !== null && !visited[r][c]) {
-            const group = [];
-            dfs(r, c, board[r][c], group);
-            if (group.length >= 4) {
-              toClear.push(...group);
-            }
-          }
-        }
-      }
-      return toClear;
-    }
-
-    function clearChains() {
-      const toClear = findChains();
-      if (toClear.length === 0) return false;
-      toClear.forEach(([r, c]) => {
-        board[r][c] = null;
-      });
-      score += toClear.length * 10;
-      scoreSpan.textContent = score;
-      return true;
-    }
-
-    function gameLoop() {
-      if (paused || isGameOver) return;
-      if (!current) {
-        // 落下中ぷよがない場合は新規生成
-        spawn();
-      } else {
-        // 落下
-        if (!moveCurrent(0, 1)) {
-          fixCurrent();
-          let cleared = false;
-          do {
-            cleared = clearChains();
-            if (cleared) {
-              applyGravity();
-            }
-          } while (cleared);
-          drawBoard();
-          current = null;
-        }
-      }
-      drawBoard();
-    }
-
-    // ハードドロップ
-    function hardDrop() {
-      if (paused || isGameOver) return;
-      while (moveCurrent(0, 1)) {}
-      fixCurrent();
-      let cleared = false;
-      do {
-        cleared = clearChains();
-        if (cleared) {
-          applyGravity();
-        }
-      } while (cleared);
-      drawBoard();
-      current = null;
-    }
-
-    // 操作ボタンイベント
-    document.getElementById("btnLeft").onclick = () => moveCurrent(-1, 0);
-    document.getElementById("btnRight").onclick = () => moveCurrent(1, 0);
-    document.getElementById("btnDown").onclick = () => moveCurrent(0, 1);
-    document.getElementById("btnUp").onclick = () => hardDrop();
-    document.getElementById("btnRotateLeft").onclick = () => rotateCurrent(false);
-    document.getElementById("btnRotateRight").onclick = () => rotateCurrent(true);
-
-    // キーボード操作
-    window.addEventListener("keydown", e => {
-      if (paused || isGameOver) return;
-      switch (e.key) {
-        case "ArrowLeft":
-          moveCurrent(-1, 0);
-          break;
-        case "ArrowRight":
-          moveCurrent(1, 0);
-          break;
-        case "ArrowDown":
-          moveCurrent(0, 1);
-          break;
-        case "ArrowUp":
-          hardDrop();
-          break;
-        case "z":
-        case "Z":
-          rotateCurrent(false);
-          break;
-        case "x":
-        case "X":
-          rotateCurrent(true);
-          break;
-        case "p":
-        case "P":
-          togglePause();
-          break;
-      }
-    });
-
-    // ゲームオーバーリスタート
-    document.getElementById("btnRestart").onclick = () => {
-      isGameOver = false;
-      score = 0;
-      scoreSpan.textContent = score;
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          board[r][c] = null;
-        }
-      }
-      current = null;
-      next = [randColor(), randColor()];
-      drawNext();
-      drawBoard();
-      gameOverOverlay.style.display = "none";
-      paused = false;
-      pauseBtn.textContent = "一時停止";
     };
 
-    // 一時停止トグル
-    function togglePause() {
-      paused = !paused;
-      pauseBtn.textContent = paused ? "再開" : "一時停止";
+    let currentLang = "ja"; // 現在の言語を保持する変数
+
+    // 日本語のレシピとアドバイスの詳細テキストを保持（他の言語では共通使用）
+    const fullJapaneseContent = {
+        "ingredients": [
+            "卵 … 1個",
+            "油 … 小さじ1（サラダ油でもごま油でもOK）",
+            "塩 … ひとつまみ"
+        ],
+        "instructions": [
+            "フライパンを中火で温め、油を入れます。",
+            "油が熱くなったら、卵をそっと割り入れます。",
+            "白身が固まりはじめたら、弱火にしてフタをします。",
+            "黄身の表面がうっすら白くなったら火を止めます。",
+            "お好みで塩をふって、できあがり！",
+            "仕上げに塩コショウ、しょうゆ、マヨネーズをトッピングしてもおいしいです。"
+        ],
+        "advice": "水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br />フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめ。",
+        "countGameTitle": "目玉焼きを数えるゲーム",
+        "countGameStart": "スタート",
+        "countGameAnswer": "答える",
+        "countGameCorrect": "🎉 正解！",
+        "countGameWrongPrefix": "😢 残念！正解は ",
+        "countGameWrongSuffix": " です。",
+        "puyoGameTitle": "目玉焼きぷよぷよ",
+        "puyoGameDescription": "画面のボタンで操作。スコア表示とNEXT表示付き",
+        "scorePrefix": "スコア: ",
+        "nextText": "NEXT",
+        "pauseButtonText": "一時停止",
+        "resumeButtonText": "再開",
+        "gameOverText": "ゲームオーバー！",
+        "restartButtonText": "リスタート"
+    };
+
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        const data = recipes[lang];
+        const defaultGameTexts = fullJapaneseContent; // ゲーム部分は日本語テキストを常に参照
+
+        if (!data) {
+            console.warn(`Language data for "${lang}" not found.`);
+            return;
+        }
+
+        // ページのタイトルを更新
+        document.title = data.title + " - v1.5";
+        // メインタイトルを更新（絵文字を保持するためinnerHTMLを使用）
+        document.querySelector("h1").innerHTML = `🍳 ${data.title} - v1.5`;
+        // アクセス数情報を更新
+        document.getElementById('accessInfo').textContent = data.accessInfoPrefix + localStorage.getItem('my_access_count');
+
+        // 材料セクションの更新
+        document.querySelector(".section:nth-of-type(1) h2").textContent = data.ingredientsTitle;
+        const ingredientsList = document.querySelector(".section:nth-of-type(1) ul");
+        // 材料のリストは共通の日本語テキストを使用
+        ingredientsList.innerHTML = fullJapaneseContent.ingredients.map(item => `<li>${item}</li>`).join("");
+
+        // 作り方セクションの更新
+        document.querySelector(".section:nth-of-type(2) h2").textContent = data.instructionsTitle;
+        const instructionsList = document.querySelector(".section:nth-of-type(2) ol");
+        // 作り方のリストは共通の日本語テキストを使用
+        instructionsList.innerHTML = fullJapaneseContent.instructions.map(item => `<li>${item}</li>`).join("");
+
+        // ワンポイントアドバイスセクションの更新
+        document.querySelector(".section:nth-of-type(3) h2").textContent = data.adviceTitle;
+        // アドバイスのテキストは共通の日本語テキストを使用
+        document.querySelector(".section:nth-of-type(3) p").innerHTML = fullJapaneseContent.advice; // HTMLタグを含むためinnerHTML
+
+        // 目玉焼きを数えるゲームの更新 (ゲームテキストは日本語固定)
+        document.querySelector("h2:nth-of-type(2)").textContent = `🥚 ${defaultGameTexts.countGameTitle}`;
+        document.querySelector("button[onclick='startCountGame()']").textContent = defaultGameTexts.countGameStart;
+        document.querySelector("#eggContainer + input + button").textContent = defaultGameTexts.countGameAnswer;
+
+        // 目玉焼きぷよぷよの更新 (ゲームテキストは日本語固定)
+        document.querySelector(".section:nth-of-type(4) h2").textContent = `🥚 ${defaultGameTexts.puyoGameTitle}`;
+        document.querySelector(".section:nth-of-type(4) p").textContent = defaultGameTexts.puyoGameDescription;
+        document.querySelector("#scoreArea").innerHTML = `${defaultGameTexts.scorePrefix}<span id="score">${score}</span>`;
+        document.querySelector("#puyoGame > div:nth-child(2) > p").textContent = defaultGameTexts.nextText;
+        // 一時停止ボタンのテキストも日本語固定
+        document.getElementById("pauseBtn").textContent = paused ? defaultGameTexts.resumeButtonText : defaultGameTexts.pauseButtonText;
+
+        // ゲームオーバーオーバーレイの更新 (ゲームテキストは日本語固定)
+        document.querySelector("#gameOverOverlay > div").textContent = defaultGameTexts.gameOverText;
+        document.getElementById("btnRestart").textContent = defaultGameTexts.restartButtonText;
+
+        // フッターの更新
+        document.querySelector(".footer").innerHTML = data.footerText;
     }
-    pauseBtn.onclick = togglePause;
 
-    // ゲームループ間隔設定
-    setInterval(() => {
-      gameLoop();
-    }, 600);
+    // アクセス数をブラウザ単位でカウントして表示（簡易版）
+    function updateAccessCount() {
+      let count = localStorage.getItem('my_access_count');
+      count = count ? parseInt(count) : 0;
+      count++;
+      localStorage.setItem('my_access_count', count);
+    }
 
-    // 初期化
-    next = [randColor(), randColor()];
-    drawNext();
-    drawBoard();
-  </script>
+    // Count Game
+    let correctCount = 0;
+    function startCountGame() {
+      const container = document.getElementById("eggContainer");
+      container.innerHTML = "";
+      correctCount = Math.floor(Math.random() * 6) + 5;
+      for (let i = 0; i < correctCount; i++) {
+        const img = document.createElement("img");
+        img.src = "fried_egg.png";
+        img.style.width = "60px";
+        img.style.margin = "5px";
+        container.appendChild(img);
+      }
+      document.getElementById("result").innerText = "";
+      document.getElementById("answer").value = "";
+    }
+    function checkCountAnswer() {
+      const userAnswer = parseInt(document.getElementById("answer").value);
+      const result = document.getElementById("result");
+        const defaultGameTexts = fullJapaneseContent; // ゲーム部分は日本語テキストを常に参照
+      result.innerText = userAnswer === correctCount ? defaultGameTexts.countGameCorrect : `${defaultGameTexts.countGameWrongPrefix}${correctCount}${defaultGameTexts.countGameWrongSuffix}`;
+    }
+
+    // Puyo Puyo Game
+    const ROWS = 12;
+    const COLS = 6;
+    const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
+    const colors = [0, 1, 2, 3];
+    let current = null;
+    let next = [];
+    let score = 0;
+    let isGameOver = false;
+    let clearing = false;
+    let paused = false;
+
+    const boardDiv = document.getElementById("board");
+    const nextDiv = document.getElementById("next");
+    const scoreSpan = document.getElementById("score");
+    const gameOverOverlay = document.getElementById("gameOverOverlay");
+    const pauseBtn = document.getElementById("pauseBtn");
+
+    // ぷよの目玉焼き画像URL
+    const puyoImgSrc = "fried_egg.png";
+
+    function drawBoard() {
+      boardDiv.innerHTML = "";
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          if (board[r][c] !== null) {
+            // 目玉焼き画像を配置
+            const img = document.createElement("img");
+            img.src = puyoImgSrc;
+            img.className = "puyo-img color" + board[r][c];
+            cell.appendChild(img);
+          }
+          boardDiv.appendChild(cell);
+        }
+      }
+
+      // 落下中のぷよ描画
+      if (current) {
+        const { x, y, vertical, pair } = current;
+
+        // 主ぷよ
+        if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
+          const idx = y * COLS + x;
+          const cell = boardDiv.children[idx];
+          const img = document.createElement("img");
+          img.src = puyoImgSrc;
+          img.className = "puyo-img color" + pair[0];
+          cell.appendChild(img);
+        }
+
+        // ペアぷよ
+        if (vertical) {
+          const py = y - 1;
+          if (py >= 0 && py < ROWS && x >= 0 && x < COLS) {
+            const idx2 = py * COLS + x;
+            const cell2 = boardDiv.children[idx2];
+            const img2 = document.createElement("img");
+            img2.src = puyoImgSrc;
+            img2.className = "puyo-img color" + pair[1];
+            cell2.appendChild(img2);
+          }
+        } else {
+          const px2 = x + 1;
+          if (y >= 0 && y < ROWS && px2 >= 0 && px2 < COLS) {
+            const idx2 = y * COLS + px2;
+            const cell2 = boardDiv.children[idx2];
+            const img2 = document.createElement("img");
+            img2.src = puyoImgSrc;
+            img2.className = "puyo-img color" + pair[1];
+            cell2.appendChild(img2);
+          }
+        }
+      }
+    }
+
+    function drawNext() {
+      nextDiv.innerHTML = "";
+      next.forEach(color => {
+        const div = document.createElement("div");
+        div.className = "cell";
+        const img = document.createElement("img");
+        img.src = puyoImgSrc;
+        img.className = "puyo-img color" + color;
+        div.appendChild(img);
+        nextDiv.appendChild(div);
+      });
+    }
+
+    function randColor() {
+      return colors[Math.floor(Math.random() * colors.length)];
+    }
+
+    function spawn() {
+      current = { x: 2, y: 1, vertical: true, pair: [...next] };
+      next = [randColor(), randColor()];
+      drawNext();
+
+      if (!canPlaceCurrent(current.x, current.y, current.vertical)) {
+        isGameOver = true;
+        gameOverOverlay.style.display = "flex";
+      }
+    }
+
+    function canPlaceCurrent(x, y, vertical) {
+      if (x < 0 || x >= COLS) return false;
+      if (vertical) {
+        if (y < 1 || y >= ROWS) return false;
+        if (board[y][x] !== null) return false;
+        if (board[y - 1][x] !== null) return false;
+      } else {
+        if (y < 0 || y >= ROWS) return false;
+        if (x + 1 >= COLS) return false;
+        if (board[y][x] !== null) return false;
+        if (board[y][x + 1] !== null) return false;
+      }
+      return true;
+    }
+
+    function moveCurrent(dx, dy) {
+      if (paused || isGameOver) return;
+      const nx = current.x + dx;
+      const ny = current.y + dy;
+      if (canPlaceCurrent(nx, ny, current.vertical)) {
+        current.x = nx;
+        current.y = ny;
+        drawBoard();
+        return true;
+      }
+      return false;
+    }
+
+    function rotateCurrent(clockwise) {
+        if (paused || isGameOver) return;
+        let vertical = current.vertical;
+        let x = current.x;
+        let y = current.y;
+
+        let newX = x;
+        let newY = y;
+        let newVertical = !vertical;
+
+        // 回転後の位置を仮計算し、配置可能かチェック
+        if (clockwise) {
+            // 現在の垂直: (x, y)と(x, y-1) -> 回転後 水平: (x, y)と(x+1, y)
+            if (vertical) {
+                if (x + 1 >= COLS || board[y][x+1] !== null) return; // 右隣がボード外 or 埋まっている
+            }
+            // 現在の水平: (x, y)と(x+1, y) -> 回転後 垂直: (x+1, y)と(x+1, y-1)
+            // ここでは主ぷよの位置を基準にするため、少し工夫が必要
+            else {
+                newX = x + 1; // 主ぷよが右に移動
+                newY = y;
+                if (y < 1 || board[newY][newX] !== null || board[newY-1][newX] !== null) return;
+            }
+        } else { // Counter-clockwise
+            // 現在の垂直: (x, y)と(x, y-1) -> 回転後 水平: (x-1, y)と(x, y)
+            if (vertical) {
+                newX = x - 1; // 主ぷよが左に移動
+                newY = y;
+                if (x - 1 < 0 || board[newY][newX] !== null) return;
+            }
+            // 現在の水平: (x, y)と(x+1, y) -> 回転後 垂直: (x, y)と(x, y-1)
+            else {
+                if (y < 1 || board[y-1][x] !== null) return; // 上がボード外 or 埋まっている
+            }
+        }
+
+        current.x = newX;
+        current.y = newY;
+        current.vertical = newVertical;
+        drawBoard();
+    }
+
+
+    function fixCurrent() {
+      if (!current) return;
+      const { x, y, vertical, pair } = current;
+      if (vertical) {
+        board[y][x] = pair[0];
+        board[y - 1][x] = pair[1];
+      } else {
+        board[y][x] = pair[0];
+        board[y][x + 1] = pair[1];
+      }
+      current = null;
+    }
+
+    // 下にぷよを落とす
+    function applyGravity() {
+      for (let c = 0; c < COLS; c++) {
+        for (let r = ROWS - 2; r >= 0; r--) {
+          if (board[r][c] !== null && board[r + 1][c] === null) {
+            board[r + 1][c] = board[r][c];
+            board[r][c] = null;
+          }
+        }
+      }
+    }
+
+    // 連鎖の判定
+    function findChains() {
+      const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
+      const toClear = [];
+      function dfs(r, c, color, group) {
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+        if (visited[r][c]) return;
+        if (board[r][c] !== color) return;
+        visited[r][c] = true;
+        group.push([r, c]);
+        dfs(r - 1, c, color, group);
+        dfs(r + 1, c, color, group);
+        dfs(r, c - 1, color, group);
+        dfs(r, c + 1, color, group);
+      }
+
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          if (board[r][c] !== null && !visited[r][c]) {
+            const group = [];
+            dfs(r, c, board[r][c], group);
+            if (group.length >= 4) {
+              toClear.push(...group);
+            }
+          }
+        }
+      }
+      return toClear;
+    }
+
+    function clearChains() {
+      const toClear = findChains();
+      if (toClear.length === 0) return false;
+      toClear.forEach(([r, c]) => {
+        board[r][c] = null;
+      });
+      score += toClear.length * 10;
+      scoreSpan.textContent = score;
+      return true;
+    }
+
+    function gameLoop() {
+      if (paused || isGameOver) return;
+      if (!current) {
+        // 落下中ぷよがない場合は新規生成
+        spawn();
+      } else {
+        // 落下
+        if (!moveCurrent(0, 1)) {
+          fixCurrent();
+          let cleared = false;
+          do {
+            cleared = clearChains();
+            if (cleared) {
+              applyGravity();
+            }
+          } while (cleared);
+          drawBoard();
+          current = null;
+        }
+      }
+      drawBoard();
+    }
+
+    // ハードドロップ
+    function hardDrop() {
+      if (paused || isGameOver) return;
+      while (moveCurrent(0, 1)) {}
+      fixCurrent();
+      let cleared = false;
+      do {
+        cleared = clearChains();
+        if (cleared) {
+          applyGravity();
+        }
+      } while (cleared);
+      drawBoard();
+      current = null;
+    }
+
+    // 操作ボタンイベント
+    document.getElementById("btnLeft").onclick = () => moveCurrent(-1, 0);
+    document.getElementById("btnRight").onclick = () => moveCurrent(1, 0);
+    document.getElementById("btnDown").onclick = () => moveCurrent(0, 1);
+    document.getElementById("btnUp").onclick = () => hardDrop();
+    document.getElementById("btnRotateLeft").onclick = () => rotateCurrent(false);
+    document.getElementById("btnRotateRight").onclick = () => rotateCurrent(true);
+
+    // キーボード操作
+    window.addEventListener("keydown", e => {
+      if (paused || isGameOver) return;
+      switch (e.key) {
+        case "ArrowLeft":
+          moveCurrent(-1, 0);
+          break;
+        case "ArrowRight":
+          moveCurrent(1, 0);
+          break;
+        case "ArrowDown":
+          moveCurrent(0, 1);
+          break;
+        case "ArrowUp":
+          hardDrop();
+          break;
+        case "z":
+        case "Z":
+          rotateCurrent(false);
+          break;
+        case "x":
+        case "X":
+          rotateCurrent(true);
+          break;
+        case "p":
+        case "P":
+          togglePause();
+          break;
+      }
+    });
+
+    // ゲームオーバーリスタート
+    document.getElementById("btnRestart").onclick = () => {
+      isGameOver = false;
+      score = 0;
+      scoreSpan.textContent = score;
+      for (let r = 0; r < ROWS; r++) {
+        for (let c = 0; c < COLS; c++) {
+          board[r][c] = null;
+        }
+      }
+      current = null;
+      next = [randColor(), randColor()];
+      drawNext();
+      drawBoard();
+      gameOverOverlay.style.display = "none";
+      paused = false;
+      // リスタート時もボタンテキストを更新
+      pauseBtn.textContent = fullJapaneseContent.pauseButtonText;
+    };
+
+    // 一時停止トグル
+    function togglePause() {
+      paused = !paused;
+      const defaultGameTexts = fullJapaneseContent; // ゲーム部分は日本語テキストを常に参照
+      pauseBtn.textContent = paused ? defaultGameTexts.resumeButtonText : defaultGameTexts.pauseButtonText;
+    }
+    pauseBtn.onclick = togglePause;
+
+    // ゲームループ間隔設定
+    setInterval(() => {
+      gameLoop();
+    }, 600);
+
+    // 初期化
+    next = [randColor(), randColor()];
+    drawNext();
+    drawBoard();
+
+    // ページロード時の初期化処理
+    document.addEventListener('DOMContentLoaded', () => {
+        updateAccessCount(); // アクセス数を更新
+        setLanguage('ja'); // 初期言語を日本語に設定してコンテンツをロード
+    });
+  </script>
 </body>
 </html>

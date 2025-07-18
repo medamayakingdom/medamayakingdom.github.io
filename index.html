@@ -4,6 +4,24 @@
   <meta charset="UTF-8" />
   <title>おいしい目玉焼きの作り方 - v1.5</title>
   <style>
+    #langSelector {
+    margin: 1em auto;
+    text-align: center;
+  }
+  #langSelector button {
+    margin: 0.2em;
+    padding: 0.4em 0.8em;
+    background-color: #e67e22;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.9em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  #langSelector button:hover {
+    background-color: #d35400;
+  }
     body {
       font-family: sans-serif;
       background-color: #fffbea;
@@ -217,6 +235,34 @@
 </head>
 <body>
   <div id="accessInfo">アクセス数：読み込み中…</div>
+
+  <div id="langSelector">
+  <strong>言語/方言を選択：</strong><br>
+  <button onclick="setLang('ja')">標準語</button>
+  <button onclick="setLang('hokkaido')">北海道弁</button>
+  <button onclick="setLang('tsugaru')">津軽弁</button>
+  <button onclick="setLang('sendai')">仙台弁</button>
+  <button onclick="setLang('ibaraki')">茨城弁</button>
+  <button onclick="setLang('nagoya')">名古屋弁</button>
+  <button onclick="setLang('kyoto')">京都弁</button>
+  <button onclick="setLang('osaka')">大阪弁</button>
+  <button onclick="setLang('kochi')">高知弁</button>
+  <button onclick="setLang('hakata')">博多弁</button>
+  <button onclick="setLang('kumamoto')">熊本弁</button>
+  <button onclick="setLang('kagoshima')">鹿児島弁</button>
+  <button onclick="setLang('okinawa')">沖縄方言</button>
+  <button onclick="setLang('en')">English</button>
+  <button onclick="setLang('zh')">中文</button>
+  <button onclick="setLang('ko')">한국어</button>
+  <button onclick="setLang('de')">Deutsch</button>
+  <button onclick="setLang('fr')">Français</button>
+  <button onclick="setLang('es')">Español</button>
+  <button onclick="setLang('ru')">Русский</button>
+  <button onclick="setLang('ar')">العربية</button>
+  <button onclick="setLang('pt')">Português</button>
+  <button onclick="setLang('hi')">हिंदी</button>
+  <button onclick="setLang('id')">Bahasa Indonesia</button>
+</div>
 
   <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
@@ -689,6 +735,12 @@
     next = [randColor(), randColor()];
     drawNext();
     drawBoard();
+
+    function setLang(lang) {
+  alert("選択された言語コード: " + lang + "\n※翻訳機能は未実装です");
+}
+
+    
   </script>
 </body>
 </html>

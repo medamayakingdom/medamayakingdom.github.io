@@ -5,23 +5,25 @@
   <title>おいしい目玉焼きの作り方 - v1.5</title>
   <style>
     #langSelector {
-    margin: 1em auto;
-    text-align: center;
-  }
-  #langSelector button {
-    margin: 0.2em;
-    padding: 0.4em 0.8em;
-    background-color: #e67e22;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.9em;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  #langSelector button:hover {
-    background-color: #d35400;
-  }
+      margin: 1em auto;
+      text-align: center;
+    }
+    #langSelector select, #langSelector button {
+      margin: 0.2em;
+      padding: 0.4em 0.8em;
+      font-size: 0.9em;
+      cursor: pointer;
+    }
+    #langSelector button {
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      transition: background-color 0.3s ease;
+    }
+    #langSelector button:hover {
+      background-color: #d35400;
+    }
     body {
       font-family: sans-serif;
       background-color: #fffbea;
@@ -35,14 +37,11 @@
       color: #e67e22;
       margin-bottom: 0.2em;
     }
-
-    /* アクセス数表示 */
     #accessInfo {
       font-size: 0.9em;
       color: #666;
       margin-bottom: 1em;
     }
-
     .egg-img {
       display: block;
       margin: 20px auto;
@@ -61,184 +60,15 @@
       color: #777;
       margin-top: 3em;
     }
-    /* Puyo game */
-    #puyoGame {
-      display: flex;
-      justify-content: center;
-      gap: 40px;
-      margin-top: 30px;
-      flex-wrap: wrap;
-    }
-    #board, #next {
-      display: grid;
-      grid-template-columns: repeat(6, 40px);
-      grid-auto-rows: 40px;
-      gap: 2px;
-      border: 2px solid #e67e22;
-      border-radius: 8px;
-      background: #fffbea;
-      box-shadow: 0 0 8px rgba(230, 126, 34, 0.3);
-      position: relative;
-    }
-    #next {
-      grid-template-columns: repeat(2, 40px);
-      width: fit-content;
-      padding: 6px;
-    }
-    .cell {
-      width: 40px;
-      height: 40px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-      border-radius: 6px;
-      transition: opacity 0.3s ease;
-      background: white; /* 空白セルは白背景 */
-      position: relative;
-    }
-    /* 色指定は使わず画像で目玉焼き表示 */
-
-    /* チカチカ用アニメーション */
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-    .blink {
-      animation: blink 0.6s ease-in-out 3;
-    }
-
-    /* 操作ボタン配置 */
-    #controls {
-      margin-top: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 16px;
-      flex-wrap: wrap;
-      user-select: none;
-    }
-    #buttonGrid {
-      display: grid;
-      grid-template-columns: 40px 40px 40px;
-      grid-template-rows: 40px 40px 40px;
-      gap: 8px;
-      user-select: none;
-    }
-    #buttonGrid button {
-      background-color: #e67e22;
-      border: none;
-      color: white;
-      font-size: 24px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-      user-select: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0;
-      line-height: 1;
-      width: 40px;
-      height: 40px;
-      font-weight: bold;
-    }
-    #buttonGrid button:hover {
-      background-color: #d35400;
-    }
-    #buttonGrid .empty {
-      background: transparent;
-      box-shadow: none;
-      cursor: default;
-      pointer-events: none;
-    }
-    /* 回転ボタンの丸ボタン */
-    #btnRotateLeft, #btnRotateRight {
-      border-radius: 50%;
-      width: 48px;
-      height: 48px;
-      font-size: 0;
-    }
-    /* SVGの色 */
-    svg {
-      fill: white;
-      width: 24px;
-      height: 24px;
-      user-select: none;
-    }
-
-    /* ゲームオーバー表示 */
-    #gameOverOverlay {
-      position: fixed;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      color: white;
-      font-size: 2em;
-      z-index: 9999;
-      flex-direction: column;
-      user-select: none;
-    }
-    #gameOverOverlay button {
-      margin-top: 20px;
-      font-size: 1em;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      background-color: #e67e22;
-      color: white;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
-      transition: background-color 0.3s ease;
-    }
-    #gameOverOverlay button:hover {
-      background-color: #d35400;
-    }
-
-    /* 一時停止ボタン */
-    #pauseBtn {
-      margin-top: 12px;
-      background-color: #2980b9;
-      border: none;
-      color: white;
-      font-size: 1em;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
-      transition: background-color 0.3s ease;
-      user-select: none;
-    }
-    #pauseBtn:hover {
-      background-color: #1f6391;
-    }
-
-    /* ぷよ画像（目玉焼き）をセルに絶対配置 */
-    .puyo-img {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 36px;
-      height: 36px;
-      pointer-events: none;
-      user-select: none;
-      filter: hue-rotate(0deg);
-      transition: filter 0.3s ease;
-    }
-    /* 色ごとのフィルター */
-    .color0 { filter: hue-rotate(0deg); }    /* 赤 */
-    .color1 { filter: hue-rotate(210deg); }  /* 青 */
-    .color2 { filter: hue-rotate(90deg); }   /* 緑 */
-    .color3 { filter: hue-rotate(50deg); }   /* 黄 */
   </style>
 </head>
 <body>
   <div id="accessInfo">アクセス数：読み込み中…</div>
 
   <div id="langSelector">
-  <label for="langSelect"><strong>言語/方言を選択：</strong></label>
+    <label for="langSelect"><strong>言語/方言を選択：</strong></label>
     <select id="langSelect">
+      <option value="ja">標準語（日本語）</option>
       <option value="ja-hkd">北海道弁</option>
       <option value="ja-tsg">津軽弁</option>
       <option value="ja-sdj">仙台弁</option>
@@ -260,485 +90,480 @@
       <option value="ru">ロシア語</option>
     </select>
     <button onclick="selectLang()">決定</button>
-</div>
+  </div>
 
   <h1>🍳 おいしい目玉焼きの作り方 - v1.5</h1>
   <img src="fried_egg.png" alt="目玉焼き" class="egg-img" />
 
-  <div class="section">
-    <h2>材料（1人分）</h2>
-    <ul>
-      <li>卵 … 1個</li>
-      <li>油 … 小さじ1（サラダ油でもごま油でもOK）</li>
-      <li>塩 … ひとつまみ</li>
-    </ul>
-  </div>
-
-  <div class="section">
-    <h2>作り方</h2>
-    <ol>
-      <li>フライパンを中火で温め、油を入れます。</li>
-      <li>油が熱くなったら、卵をそっと割り入れます。</li>
-      <li>白身が固まりはじめたら、弱火にしてフタをします。</li>
-      <li>黄身の表面がうっすら白くなったら火を止めます。</li>
-      <li>お好みで塩をふって、できあがり！</li>
-      <li>仕上げに塩コショウ、しょうゆ、マヨネーズをトッピングしてもおいしいです。</li>
-    </ol>
-  </div>
-
-  <div class="section">
-    <h2>ワンポイントアドバイス</h2>
-    <p>
-      水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br />
-      フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめ。
-    </p>
-  </div>
-
-  <hr />
-
-  <h2>🥚 目玉焼きを数えるゲーム</h2>
-  <button onclick="startCountGame()">スタート</button>
-  <div id="eggContainer" style="margin-top: 20px;"></div>
-  <input type="number" id="answer" />
-  <button onclick="checkCountAnswer()">答える</button>
-  <p id="result"></p>
-
-  <hr />
-
-  <div class="section">
-    <h2>🥚 目玉焼きぷよぷよ</h2>
-    <p>画面のボタンで操作。スコア表示とNEXT表示付き</p>
-    <div id="puyoGame">
-      <div>
-        <div id="board"></div>
-        <div id="scoreArea" style="margin-top:8px; font-weight:bold;">スコア: <span id="score">0</span></div>
-        <button id="pauseBtn">一時停止</button>
-      </div>
-      <div>
-        <p>NEXT</p>
-        <div id="next"></div>
-      </div>
-    </div>
-    <div id="controls">
-      <div id="buttonGrid">
-        <button id="btnRotateLeft" title="左回転 ⟲">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(-90deg);">
-            <path d="M12 2a10 10 0 1 0 10 10h-2a8 8 0 1 1-8-8v3l4-4-4-4v3z"/>
-          </svg>
-        </button>
-        <button id="btnUp" title="ハードドロップ ↑">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M12 4l-8 8h5v8h6v-8h5z"/>
-          </svg>
-        </button>
-        <button id="btnRotateRight" title="右回転 ⟳">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" style="transform: rotate(90deg);">
-            <path d="M12 2a10 10 0 1 1-10 10h2a8 8 0 1 0 8-8v3l-4-4 4-4v3z"/>
-          </svg>
-        </button>
-        <button id="btnLeft" title="左 ←">←</button>
-        <button class="empty" aria-hidden="true" tabindex="-1"></button>
-        <button id="btnRight" title="右 →">→</button>
-        <button id="btnDown" title="下 ↓">↓</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="gameOverOverlay" role="alert" aria-live="assertive">
-    <div>ゲームオーバー！</div>
-    <button id="btnRestart">リスタート</button>
-  </div>
-
-  <div class="footer">&copy; 2025 medamayakingdom</div>
+  <div class="section" id="materialsSection"></div>
+  <div class="section" id="instructionsSection"></div>
+  <div class="section" id="adviceSection"></div>
 
   <script>
-    // アクセス数をブラウザ単位でカウントして表示（簡易版）
-    function updateAccessCount() {
-      let count = localStorage.getItem('my_access_count');
-      count = count ? parseInt(count) : 0;
-      count++;
-      localStorage.setItem('my_access_count', count);
-      document.getElementById('accessInfo').textContent = `あなたのこのブラウザでのアクセス数：${count}`;
-    }
-    updateAccessCount();
+    const languageContents = {
+      "ja": {
+        materials: `
+          <h2>材料（標準語）</h2>
+          <ul>
+            <li>卵 … 1個</li>
+            <li>油 … 小さじ1（サラダ油でもごま油でもOK）</li>
+            <li>塩 … ひとつまみ</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（標準語）</h2>
+          <ol>
+            <li>フライパンを中火で温め、油を入れます。</li>
+            <li>油が熱くなったら、卵をそっと割り入れます。</li>
+            <li>白身が固まりはじめたら、弱火にしてフタをします。</li>
+            <li>黄身の表面がうっすら白くなったら火を止めます。</li>
+            <li>お好みで塩をふって、できあがり！</li>
+            <li>仕上げに塩コショウ、しょうゆ、マヨネーズをトッピングしてもおいしいです。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（標準語）</h2>
+          <p>
+            水を少し加えて蒸し焼きにすると、白身がふっくら仕上がります。<br />
+            フタをせず「サニーサイドアップ（片面焼き）」にするのもおすすめ。
+          </p>`
+      },
 
-    // Count Game
-    let correctCount = 0;
-    function startCountGame() {
-      const container = document.getElementById("eggContainer");
-      container.innerHTML = "";
-      correctCount = Math.floor(Math.random() * 6) + 5;
-      for (let i = 0; i < correctCount; i++) {
-        const img = document.createElement("img");
-        img.src = "fried_egg.png";
-        img.style.width = "60px";
-        img.style.margin = "5px";
-        container.appendChild(img);
+      "ja-hkd": {
+        materials: `
+          <h2>材料（北海道弁）</h2>
+          <ul>
+            <li>たまご…1こ</li>
+            <li>あぶら…こさじ1（サラダあぶらでもごま油でもええよ）</li>
+            <li>しお…ちょっとだけ</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（北海道弁）</h2>
+          <ol>
+            <li>フライパンを中火であっためて、あぶらを入れるべさ。</li>
+            <li>あぶらがあつくなったら、たまごをそっとわり入れるっしょ。</li>
+            <li>白身がかたまりはじめたら、火をよわめてふたをするっちゃ。</li>
+            <li>黄身の上がうっすら白くなったら火を止めるべ。</li>
+            <li>おこのみでしおをふって、できあがりだべさ！</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（北海道弁）</h2>
+          <p>みずをちょっといれてむしやきにすると、白身がふっくらすっぺや。ふたをせずに「サニーサイドアップ（片面焼き）」もおすすめだべさ。</p>`
+      },
+
+      "ja-tsg": {
+        materials: `
+          <h2>材料（津軽弁）</h2>
+          <ul>
+            <li>たまご…ひとつ</li>
+            <li>あぶら…こさじ1（サラダあぶらかごま油さもいいべ）</li>
+            <li>しお…すこし</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（津軽弁）</h2>
+          <ol>
+            <li>フライパンさ中火であたためて、あぶら入れるべし。</li>
+            <li>あぶらが熱くなったら、たまごそっと割って入れるべし。</li>
+            <li>白身が固まりはじめたら、火弱めて蓋すっぺし。</li>
+            <li>黄身の表面が薄く白くなったら火止めるべし。</li>
+            <li>好みで塩ふって、できあがりだべ。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（津軽弁）</h2>
+          <p>水を少し加えて蒸し焼きにすると、白身がふっくら仕上がるべ。蓋しねで「サニーサイドアップ」もおすすめだべ。</p>`
+      },
+
+      "ja-sdj": {
+        materials: `
+          <h2>材料（仙台弁）</h2>
+          <ul>
+            <li>たまご…1個</li>
+            <li>あぶら…小さじ1（サラダ油かごま油どっちでもいいっちゃ）</li>
+            <li>しお…ちょっとだけ</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（仙台弁）</h2>
+          <ol>
+            <li>フライパンを中火であたためて、あぶらをいれっちゃ。</li>
+            <li>あぶらがあつくなったら、たまごをそっと割りいれるっちゃ。</li>
+            <li>白身がかたまりはじめたら、弱火にしてふたをすっちゃ。</li>
+            <li>黄身の表面がうっすら白くなったら火を止めっちゃ。</li>
+            <li>おこのみでしおをふってできあがりだっちゃ。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（仙台弁）</h2>
+          <p>水を少し足して蒸し焼きにすると、白身がふっくらするっちゃ。ふたをせずに「サニーサイドアップ」もおすすめだっちゃ。</p>`
+      },
+
+      "ja-ibr": {
+        materials: `
+          <h2>材料（茨城弁）</h2>
+          <ul>
+            <li>たまご…1こ</li>
+            <li>あぶら…こさじ1（サラダあぶらでもごま油でもいいべ）</li>
+            <li>しお…ちょっとだけ</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（茨城弁）</h2>
+          <ol>
+            <li>フライパンを中火であっためて、あぶら入れるべ。</li>
+            <li>あぶらが熱くなったら、たまごをそっと割り入れるべ。</li>
+            <li>白身がかたまりはじめたら、火を弱めてフタすっぺ。</li>
+            <li>黄身の表面が薄く白くなったら火を止めるべ。</li>
+            <li>好みで塩をふってできあがりだっぺよ。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（茨城弁）</h2>
+          <p>水をちょっと加えて蒸し焼きにすると、白身がふっくらするべ。フタせずに「サニーサイドアップ」もいいべよ。</p>`
+      },
+
+      "ja-nag": {
+        materials: `
+          <h2>材料（名古屋弁）</h2>
+          <ul>
+            <li>たまご…ひとつ</li>
+            <li>あぶら…こさじ1（サラダあぶらでもごま油でもええで）</li>
+            <li>しお…ちょっとだけ</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（名古屋弁）</h2>
+          <ol>
+            <li>フライパンを中火であっためて、あぶら入れるがね。</li>
+            <li>あぶらが熱うなったら、たまごをそっと割り入れるがや。</li>
+            <li>白身がかたまりはじめたら、弱火にしてフタするがね。</li>
+            <li>黄身の表面がうっすら白うなったら火を止めるがや。</li>
+            <li>お好みでしおをふってできあがりだがね。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（名古屋弁）</h2>
+          <p>水をちょっと入れて蒸し焼きにすると、白身がふっくらするがね。フタをせずに「サニーサイドアップ」もおすすめだがね。</p>`
+      },
+
+      "ja-kyoto": {
+        materials: `
+          <h2>材料（京都弁）</h2>
+          <ul>
+            <li>卵…1こどす</li>
+            <li>油…小さじ1（サラダ油どすえ、ごま油でもええどす）</li>
+            <li>塩…ひとつまみどす</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（京都弁）</h2>
+          <ol>
+            <li>フライパンを中火で温めて、油を入れはります。</li>
+            <li>油が熱うなったら、卵をそっと割り入れはります。</li>
+            <li>白身が固まりはじめはったら、弱火にして蓋をしますえ。</li>
+            <li>黄身の表面がうっすら白うなったら火を止めはります。</li>
+            <li>お好みで塩を振って、できあがりどす。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（京都弁）</h2>
+          <p>水を少し加えて蒸し焼きにすると、白身がふっくら仕上がりますえ。蓋をせんと「サニーサイドアップ」もおすすめどす。</p>`
+      },
+
+      "ja-osaka": {
+        materials: `
+          <h2>材料（大阪弁）</h2>
+          <ul>
+            <li>たまご…1こやで</li>
+            <li>あぶら…こさじ1（サラダあぶらでもごま油でもええで）</li>
+            <li>しお…ちょっとだけな</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（大阪弁）</h2>
+          <ol>
+            <li>フライパンを中火で温めて、あぶら入れるで。</li>
+            <li>あぶらが熱なったら、たまごをそっと割り入れるんや。</li>
+            <li>白身が固まりはじめたら、弱火にしてフタすんねん。</li>
+            <li>黄身の表面がうっすら白なったら火止めるで。</li>
+            <li>好みで塩ふって、できあがりやで！</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（大阪弁）</h2>
+          <p>水ちょっと入れて蒸し焼きにしたら、白身ふっくらするで。フタせんと「サニーサイドアップ」もええで。</p>`
+      },
+
+      "ja-kochi": {
+        materials: `
+          <h2>材料（高知弁）</h2>
+          <ul>
+            <li>たまご…1個やき</li>
+            <li>あぶら…こさじ1（サラダあぶらでもごま油でもえいき）</li>
+            <li>しお…ちょっとだけ入れちょってや</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（高知弁）</h2>
+          <ol>
+            <li>フライパンを中火であっためて、あぶら入れちょってや。</li>
+            <li>あぶらが熱なったら、たまごをそっと割り入れちょってや。</li>
+            <li>白身が固まりはじめたら、弱火にしてフタしちょってや。</li>
+            <li>黄身の表面がうっすら白うなったら火止めちゃってや。</li>
+            <li>好みで塩ふってできあがりやき。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（高知弁）</h2>
+          <p>水をちょっと入れて蒸し焼きにすると、白身がふっくら仕上がるき。フタせんと「サニーサイドアップ」もおすすめやき。</p>`
+      },
+
+      "ja-hakata": {
+        materials: `
+          <h2>材料（博多弁）</h2>
+          <ul>
+            <li>たまご…1こばい</li>
+            <li>あぶら…こさじ1（サラダ油でもごま油でもよかとよ）</li>
+            <li>しお…ちょっとだけね</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（博多弁）</h2>
+          <ol>
+            <li>フライパンを中火で温めて、あぶらば入れるとよ。</li>
+            <li>あぶらが熱うなったら、たまごばそっと割り入れるとよ。</li>
+            <li>白身が固まりはじめたら、弱火にして蓋ばするっちゃ。</li>
+            <li>黄身の表面がうっすら白くなったら火を止めるとよ。</li>
+            <li>好みで塩ば振って、できあがりばい。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（博多弁）</h2>
+          <p>水ば少し足して蒸し焼きにすると、白身がふっくらするとよ。蓋せんで「サニーサイドアップ」もおすすめたい。</p>`
+      },
+
+      "ja-kumamoto": {
+        materials: `
+          <h2>材料（熊本弁）</h2>
+          <ul>
+            <li>たまご…1個ばい</li>
+            <li>あぶら…こさじ1ばい（サラダ油でもごま油でもよかよ）</li>
+            <li>しお…ちょっとだけばい</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（熊本弁）</h2>
+          <ol>
+            <li>フライパンば中火で温めて、あぶらば入れるとたい。</li>
+            <li>あぶらが熱ゅうなったら、たまごばそっと割り入れるとたい。</li>
+            <li>白身が固まりはじめたら、弱火にして蓋ばするたい。</li>
+            <li>黄身の表面がうっすら白うなったら火ば止めるとたい。</li>
+            <li>好みで塩ば振って、できあがりたい。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（熊本弁）</h2>
+          <p>水を少し足して蒸し焼きにすると、白身がふっくら仕上がるたい。蓋をせんで「サニーサイドアップ」もおすすめたい。</p>`
+      },
+
+      "ja-kagoshima": {
+        materials: `
+          <h2>材料（鹿児島弁）</h2>
+          <ul>
+            <li>たまご…1こじゃっど</li>
+            <li>あぶら…こさじ1じゃっど（サラダ油でもごま油でもよかど）</li>
+            <li>しお…ちょっとだけじゃっど</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（鹿児島弁）</h2>
+          <ol>
+            <li>フライパンを中火であっためて、あぶら入れっど。</li>
+            <li>あぶらが熱ゅうなったら、たまごをそっと割り入れっど。</li>
+            <li>白身が固まりはじめたら、弱火にして蓋しっど。</li>
+            <li>黄身の表面がうっすら白うなったら火ば止めっど。</li>
+            <li>好みで塩ば振って、できあがりじゃっど。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（鹿児島弁）</h2>
+          <p>水をちょっと入れて蒸し焼きにすると、白身がふっくら仕上がるど。蓋せんで「サニーサイドアップ」もおすすめじゃっど。</p>`
+      },
+
+      "ja-okinawa": {
+        materials: `
+          <h2>材料（沖縄方言）</h2>
+          <ul>
+            <li>たまご…1こやいびーん</li>
+            <li>あぶら…こさじ1（サラダ油やごま油どぅでもよーさー）</li>
+            <li>しお…ちょっとだけさー</li>
+          </ul>`,
+        instructions: `
+          <h2>作り方（沖縄方言）</h2>
+          <ol>
+            <li>フライパンん中火にしてあっためて、あぶら入れるさー。</li>
+            <li>あぶら熱なったら、たまごそっと割り入れるさー。</li>
+            <li>白身固まりはじめたら、弱火にしてフタするさー。</li>
+            <li>黄身の表面うっすら白くなったら火止めるさー。</li>
+            <li>お好みでしおふってできあがりさー。</li>
+          </ol>`,
+        advice: `
+          <h2>ワンポイントアドバイス（沖縄方言）</h2>
+          <p>水ちょっと入れて蒸し焼きにすると、白身ふっくらするさー。フタせずに「サニーサイドアップ」もおすすめさー。</p>`
+      },
+
+      "en": {
+        materials: `
+          <h2>Ingredients (English)</h2>
+          <ul>
+            <li>1 egg</li>
+            <li>1 teaspoon oil (vegetable or sesame oil is fine)</li>
+            <li>a pinch of salt</li>
+          </ul>`,
+        instructions: `
+          <h2>Instructions (English)</h2>
+          <ol>
+            <li>Heat a frying pan over medium heat and add oil.</li>
+            <li>When the oil is hot, carefully crack the egg into the pan.</li>
+            <li>Once the white starts to set, reduce heat to low and cover the pan.</li>
+            <li>When the yolk surface becomes slightly opaque, turn off the heat.</li>
+            <li>Sprinkle salt to taste and enjoy!</li>
+          </ol>`,
+        advice: `
+          <h2>Tips (English)</h2>
+          <p>Adding a little water and steaming can make the egg whites fluffier.<br>Cooking without a lid for sunny-side up is also recommended.</p>`
+      },
+
+      "zh": {
+        materials: `
+          <h2>材料（中文）</h2>
+          <ul>
+            <li>鸡蛋 1个</li>
+            <li>油 1茶匙（食用油或香油均可）</li>
+            <li>少许盐</li>
+          </ul>`,
+        instructions: `
+          <h2>做法（中文）</h2>
+          <ol>
+            <li>中火加热平底锅，倒入油。</li>
+            <li>油热后，小心打入鸡蛋。</li>
+            <li>蛋白开始凝固时，转小火并盖锅盖。</li>
+            <li>蛋黄表面稍微变白时，关火。</li>
+            <li>根据口味撒盐，完成！</li>
+          </ol>`,
+        advice: `
+          <h2>小贴士（中文）</h2>
+          <p>加入少量水蒸煮，可以让蛋白更蓬松。<br>不盖锅盖煎“单面煎蛋”也很美味。</p>`
+      },
+
+      "ko": {
+        materials: `
+          <h2>재료 (한국어)</h2>
+          <ul>
+            <li>계란 1개</li>
+            <li>기름 1작은술 (식용유 또는 참기름)</li>
+            <li>소금 약간</li>
+          </ul>`,
+        instructions: `
+          <h2>만드는 법 (한국어)</h2>
+          <ol>
+            <li>중불로 프라이팬을 달군 후 기름을 두릅니다.</li>
+            <li>기름이 달궈지면 계란을 조심스럽게 깨서 넣습니다.</li>
+            <li>흰자가 굳기 시작하면 약한 불로 줄이고 뚜껑을 덮습니다.</li>
+            <li>노른자 표면이 살짝 불투명해지면 불을 끕니다.</li>
+            <li>기호에 따라 소금을 뿌려 완성합니다.</li>
+          </ol>`,
+        advice: `
+          <h2>팁 (한국어)</h2>
+          <p>물을 조금 넣고 찌듯이 하면 흰자가 부드럽게 익습니다.<br>뚜껑을 덮지 않고 한쪽 면만 익히는 ‘써니 사이드 업’도 추천합니다.</p>`
+      },
+
+      "de": {
+        materials: `
+          <h2>Zutaten (Deutsch)</h2>
+          <ul>
+            <li>1 Ei</li>
+            <li>1 Teelöffel Öl (Sonnenblumenöl oder Sesamöl)</li>
+            <li>Eine Prise Salz</li>
+          </ul>`,
+        instructions: `
+          <h2>Zubereitung (Deutsch)</h2>
+          <ol>
+            <li>Eine Pfanne bei mittlerer Hitze erhitzen und Öl hinzufügen.</li>
+            <li>Wenn das Öl heiß ist, das Ei vorsichtig hineinschlagen.</li>
+            <li>Wenn das Eiweiß zu stocken beginnt, die Hitze reduzieren und die Pfanne abdecken.</li>
+            <li>Wenn die Oberfläche des Eigelbs leicht undurchsichtig wird, die Hitze ausschalten.</li>
+            <li>Nach Geschmack Salz darüber streuen und servieren.</li>
+          </ol>`,
+        advice: `
+          <h2>Tipps (Deutsch)</h2>
+          <p>Etwas Wasser hinzugeben und dämpfen, so wird das Eiweiß fluffiger.<br>Ohne Deckel zu braten („Sunny Side Up“) ist ebenfalls zu empfehlen.</p>`
+      },
+
+      "fr": {
+        materials: `
+          <h2>Ingrédients (Français)</h2>
+          <ul>
+            <li>1 œuf</li>
+            <li>1 cuillère à café d'huile (huile de tournesol ou huile de sésame)</li>
+            <li>Une pincée de sel</li>
+          </ul>`,
+        instructions: `
+          <h2>Préparation (Français)</h2>
+          <ol>
+            <li>Chauffer une poêle à feu moyen et ajouter l'huile.</li>
+            <li>Lorsque l'huile est chaude, casser délicatement l'œuf dans la poêle.</li>
+            <li>Lorsque le blanc commence à cuire, baisser le feu et couvrir la poêle.</li>
+            <li>Lorsque la surface du jaune devient légèrement opaque, couper le feu.</li>
+            <li>Ajouter du sel selon le goût et servir.</li>
+          </ol>`,
+        advice: `
+          <h2>Conseils (Français)</h2>
+          <p>Ajouter un peu d'eau et cuire à la vapeur rend le blanc d'œuf plus moelleux.<br>Cuire sans couvercle pour un œuf au plat est aussi recommandé.</p>`
+      },
+
+      "es": {
+        materials: `
+          <h2>Ingredientes (Español)</h2>
+          <ul>
+            <li>1 huevo</li>
+            <li>1 cucharadita de aceite (aceite vegetal o de sésamo)</li>
+            <li>Una pizca de sal</li>
+          </ul>`,
+        instructions: `
+          <h2>Instrucciones (Español)</h2>
+          <ol>
+            <li>Calienta una sartén a fuego medio y agrega el aceite.</li>
+            <li>Cuando el aceite esté caliente, rompe el huevo con cuidado y agrégalo a la sartén.</li>
+            <li>Cuando la clara comience a cuajar, baja el fuego y tapa la sartén.</li>
+            <li>Cuando la superficie de la yema esté ligeramente opaca, apaga el fuego.</li>
+            <li>Agrega sal al gusto y disfruta.</li>
+          </ol>`,
+        advice: `
+          <h2>Consejos (Español)</h2>
+          <p>Agregar un poco de agua y cocinar al vapor puede hacer que la clara quede más esponjosa.<br>También es recomendable cocinar sin tapa para huevos fritos por un lado.</p>`
+      },
+
+      "ru": {
+        materials: `
+          <h2>Ингредиенты (Русский)</h2>
+          <ul>
+            <li>1 яйцо</li>
+            <li>1 чайная ложка масла (растительного или кунжутного)</li>
+            <li>щепотка соли</li>
+          </ul>`,
+        instructions: `
+          <h2>Приготовление (Русский)</h2>
+          <ol>
+            <li>Разогрейте сковороду на среднем огне и добавьте масло.</li>
+            <li>Когда масло нагреется, аккуратно разбейте яйцо на сковороду.</li>
+            <li>Когда белок начнет схватываться, уменьшите огонь и накройте сковороду крышкой.</li>
+            <li>Когда поверхность желтка станет слегка непрозрачной, выключите огонь.</li>
+            <li>Посолите по вкусу и подавайте к столу.</li>
+          </ol>`,
+        advice: `
+          <h2>Советы (Русский)</h2>
+          <p>Добавление немного воды и приготовление на пару сделает белок более пышным.<br>Приготовление без крышки («глазунья») тоже рекомендуется.</p>`
       }
-      document.getElementById("result").innerText = "";
-      document.getElementById("answer").value = "";
-    }
-    function checkCountAnswer() {
-      const userAnswer = parseInt(document.getElementById("answer").value);
-      const result = document.getElementById("result");
-      result.innerText = userAnswer === correctCount ? "🎉 正解！" : `😢 残念！正解は ${correctCount} です。`;
-    }
-
-    // Puyo Puyo Game
-    const ROWS = 12;
-    const COLS = 6;
-    const board = Array.from({ length: ROWS }, () => Array(COLS).fill(null));
-    const colors = [0, 1, 2, 3];
-    let current = null;
-    let next = [];
-    let score = 0;
-    let isGameOver = false;
-    let clearing = false;
-    let paused = false;
-
-    const boardDiv = document.getElementById("board");
-    const nextDiv = document.getElementById("next");
-    const scoreSpan = document.getElementById("score");
-    const gameOverOverlay = document.getElementById("gameOverOverlay");
-    const pauseBtn = document.getElementById("pauseBtn");
-
-    // ぷよの目玉焼き画像URL
-    const puyoImgSrc = "fried_egg.png";
-
-    function drawBoard() {
-      boardDiv.innerHTML = "";
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          const cell = document.createElement("div");
-          cell.className = "cell";
-          if (board[r][c] !== null) {
-            // 目玉焼き画像を配置
-            const img = document.createElement("img");
-            img.src = puyoImgSrc;
-            img.className = "puyo-img color" + board[r][c];
-            cell.appendChild(img);
-          }
-          boardDiv.appendChild(cell);
-        }
-      }
-
-      // 落下中のぷよ描画
-      if (current) {
-        const { x, y, vertical, pair } = current;
-
-        // 主ぷよ
-        if (y >= 0 && y < ROWS && x >= 0 && x < COLS) {
-          const idx = y * COLS + x;
-          const cell = boardDiv.children[idx];
-          const img = document.createElement("img");
-          img.src = puyoImgSrc;
-          img.className = "puyo-img color" + pair[0];
-          cell.appendChild(img);
-        }
-
-        // ペアぷよ
-        if (vertical) {
-          const py = y - 1;
-          if (py >= 0 && py < ROWS && x >= 0 && x < COLS) {
-            const idx2 = py * COLS + x;
-            const cell2 = boardDiv.children[idx2];
-            const img2 = document.createElement("img");
-            img2.src = puyoImgSrc;
-            img2.className = "puyo-img color" + pair[1];
-            cell2.appendChild(img2);
-          }
-        } else {
-          const px2 = x + 1;
-          if (y >= 0 && y < ROWS && px2 >= 0 && px2 < COLS) {
-            const idx2 = y * COLS + px2;
-            const cell2 = boardDiv.children[idx2];
-            const img2 = document.createElement("img");
-            img2.src = puyoImgSrc;
-            img2.className = "puyo-img color" + pair[1];
-            cell2.appendChild(img2);
-          }
-        }
-      }
-    }
-
-    function drawNext() {
-      nextDiv.innerHTML = "";
-      next.forEach(color => {
-        const div = document.createElement("div");
-        div.className = "cell";
-        const img = document.createElement("img");
-        img.src = puyoImgSrc;
-        img.className = "puyo-img color" + color;
-        div.appendChild(img);
-        nextDiv.appendChild(div);
-      });
-    }
-
-    function randColor() {
-      return colors[Math.floor(Math.random() * colors.length)];
-    }
-
-    function spawn() {
-      current = { x: 2, y: 1, vertical: true, pair: [...next] };
-      next = [randColor(), randColor()];
-      drawNext();
-
-      if (!canPlaceCurrent(current.x, current.y, current.vertical)) {
-        isGameOver = true;
-        gameOverOverlay.style.display = "flex";
-      }
-    }
-
-    function canPlaceCurrent(x, y, vertical) {
-      if (x < 0 || x >= COLS) return false;
-      if (vertical) {
-        if (y < 1 || y >= ROWS) return false;
-        if (board[y][x] !== null) return false;
-        if (board[y - 1][x] !== null) return false;
-      } else {
-        if (y < 0 || y >= ROWS) return false;
-        if (x + 1 >= COLS) return false;
-        if (board[y][x] !== null) return false;
-        if (board[y][x + 1] !== null) return false;
-      }
-      return true;
-    }
-
-    function moveCurrent(dx, dy) {
-      if (paused || isGameOver) return;
-      const nx = current.x + dx;
-      const ny = current.y + dy;
-      if (canPlaceCurrent(nx, ny, current.vertical)) {
-        current.x = nx;
-        current.y = ny;
-        drawBoard();
-        return true;
-      }
-      return false;
-    }
-
-    function rotateCurrent(clockwise) {
-  if (paused || isGameOver) return;
-  let vertical = current.vertical;
-  let x = current.x;
-  let y = current.y;
-
-  if (clockwise) {
-    // 右回転時の座標調整・判定
-    if (vertical) {
-      // 縦→横に回転
-      if (x + 1 >= COLS) return;
-      if (!canPlaceCurrent(x, y, false)) return;
-      current.x = x; // 必要に応じ調整
-    } else {
-      // 横→縦に回転
-      if (y < 1) return;
-      if (!canPlaceCurrent(x, y, true)) return;
-    }
-    current.vertical = !vertical;
-  } else {
-    // 左回転時の座標調整・判定
-    if (vertical) {
-      // 縦→横に回転（左回転は右回転と少し違う場合がある）
-      if (x - 1 < 0) return;
-      if (!canPlaceCurrent(x - 1, y, false)) return;
-      current.x = x - 1;
-    } else {
-      // 横→縦に回転
-      if (y < 1) return;
-      if (!canPlaceCurrent(x, y, true)) return;
-    }
-    current.vertical = !vertical;
-  }
-  drawBoard();
-}
-
-
-    function fixCurrent() {
-      if (!current) return;
-      const { x, y, vertical, pair } = current;
-      if (vertical) {
-        board[y][x] = pair[0];
-        board[y - 1][x] = pair[1];
-      } else {
-        board[y][x] = pair[0];
-        board[y][x + 1] = pair[1];
-      }
-      current = null;
-    }
-
-    // 下にぷよを落とす
-    function applyGravity() {
-      for (let c = 0; c < COLS; c++) {
-        for (let r = ROWS - 2; r >= 0; r--) {
-          if (board[r][c] !== null && board[r + 1][c] === null) {
-            board[r + 1][c] = board[r][c];
-            board[r][c] = null;
-          }
-        }
-      }
-    }
-
-    // 連鎖の判定
-    function findChains() {
-      const visited = Array.from({ length: ROWS }, () => Array(COLS).fill(false));
-      const toClear = [];
-      function dfs(r, c, color, group) {
-        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
-        if (visited[r][c]) return;
-        if (board[r][c] !== color) return;
-        visited[r][c] = true;
-        group.push([r, c]);
-        dfs(r - 1, c, color, group);
-        dfs(r + 1, c, color, group);
-        dfs(r, c - 1, color, group);
-        dfs(r, c + 1, color, group);
-      }
-
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          if (board[r][c] !== null && !visited[r][c]) {
-            const group = [];
-            dfs(r, c, board[r][c], group);
-            if (group.length >= 4) {
-              toClear.push(...group);
-            }
-          }
-        }
-      }
-      return toClear;
-    }
-
-    function clearChains() {
-      const toClear = findChains();
-      if (toClear.length === 0) return false;
-      toClear.forEach(([r, c]) => {
-        board[r][c] = null;
-      });
-      score += toClear.length * 10;
-      scoreSpan.textContent = score;
-      return true;
-    }
-
-    function gameLoop() {
-      if (paused || isGameOver) return;
-      if (!current) {
-        // 落下中ぷよがない場合は新規生成
-        spawn();
-      } else {
-        // 落下
-        if (!moveCurrent(0, 1)) {
-          fixCurrent();
-          let cleared = false;
-          do {
-            cleared = clearChains();
-            if (cleared) {
-              applyGravity();
-            }
-          } while (cleared);
-          drawBoard();
-          current = null;
-        }
-      }
-      drawBoard();
-    }
-
-    // ハードドロップ
-    function hardDrop() {
-      if (paused || isGameOver) return;
-      while (moveCurrent(0, 1)) {}
-      fixCurrent();
-      let cleared = false;
-      do {
-        cleared = clearChains();
-        if (cleared) {
-          applyGravity();
-        }
-      } while (cleared);
-      drawBoard();
-      current = null;
-    }
-
-    // 操作ボタンイベント
-    document.getElementById("btnLeft").onclick = () => moveCurrent(-1, 0);
-    document.getElementById("btnRight").onclick = () => moveCurrent(1, 0);
-    document.getElementById("btnDown").onclick = () => moveCurrent(0, 1);
-    document.getElementById("btnUp").onclick = () => hardDrop();
-    document.getElementById("btnRotateLeft").onclick = () => rotateCurrent(false);
-    document.getElementById("btnRotateRight").onclick = () => rotateCurrent(true);
-
-    // キーボード操作
-    window.addEventListener("keydown", e => {
-      if (paused || isGameOver) return;
-      switch (e.key) {
-        case "ArrowLeft":
-          moveCurrent(-1, 0);
-          break;
-        case "ArrowRight":
-          moveCurrent(1, 0);
-          break;
-        case "ArrowDown":
-          moveCurrent(0, 1);
-          break;
-        case "ArrowUp":
-          hardDrop();
-          break;
-        case "z":
-        case "Z":
-          rotateCurrent(false);
-          break;
-        case "x":
-        case "X":
-          rotateCurrent(true);
-          break;
-        case "p":
-        case "P":
-          togglePause();
-          break;
-      }
-    });
-
-    // ゲームオーバーリスタート
-    document.getElementById("btnRestart").onclick = () => {
-      isGameOver = false;
-      score = 0;
-      scoreSpan.textContent = score;
-      for (let r = 0; r < ROWS; r++) {
-        for (let c = 0; c < COLS; c++) {
-          board[r][c] = null;
-        }
-      }
-      current = null;
-      next = [randColor(), randColor()];
-      drawNext();
-      drawBoard();
-      gameOverOverlay.style.display = "none";
-      paused = false;
-      pauseBtn.textContent = "一時停止";
     };
 
-    // 一時停止トグル
-    function togglePause() {
-      paused = !paused;
-      pauseBtn.textContent = paused ? "再開" : "一時停止";
-    }
-    pauseBtn.onclick = togglePause;
-
-    // ゲームループ間隔設定
-    setInterval(() => {
-      gameLoop();
-    }, 600);
-
-    // 初期化
-    next = [randColor(), randColor()];
-    drawNext();
-    drawBoard();
-
     function selectLang() {
-      const selected = document.getElementById("langSelect").value;
-      alert("選択された言語コード: " + selected + "\n※翻訳機能はまだ実装されていません");
+      const lang = document.getElementById("langSelect").value;
+      const content = languageContents[lang] || languageContents["ja"];
+      document.getElementById("materialsSection").innerHTML = content.materials;
+      document.getElementById("instructionsSection").innerHTML = content.instructions;
+      document.getElementById("adviceSection").innerHTML = content.advice;
     }
-    
+
+    window.onload = function () {
+      // 初期表示は標準語
+      document.getElementById("langSelect").value = "ja";
+      selectLang();
+
+      // アクセスカウンタ表示
+      // ※ユーザー提供のアクセス数はここで設定
+      const accessCount = 25410;
+      document.getElementById("accessInfo").textContent = `アクセス数：${accessCount.toLocaleString()} 回`;
+    };
   </script>
 </body>
 </html>
